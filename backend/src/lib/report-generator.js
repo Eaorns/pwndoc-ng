@@ -28,13 +28,14 @@ async function generateDoc(audit) {
     var preppedAudit = await prepAuditData(audit, settings)
 
     var opts = {};
-    // opts.centered = true;
     opts.getImage = function(tagValue, tagName) {
+        if (tagName.split(' ')[0] == "sliderImage") {
+            return fs.readFileSync(tagValue);
+        }
         if (tagValue !== "undefined") {
             tagValue = tagValue.split(",")[1];
             return Buffer.from(tagValue, 'base64');
         }
-        // return fs.readFileSync(tagValue, {encoding: 'base64'});
     }
     opts.getSize = function(img, tagValue, tagName) {
         if (img) {
@@ -55,6 +56,10 @@ async function generateDoc(audit) {
                     height = Math.floor(sizeObj.height / divider);
                     width = 400;
                 }
+            }
+            else if (tagName.split(' ')[0] == "sliderImage") {
+                width = 220;
+                height = 20;
             }
             else if (sizeObj.width > 600) {
                 var divider = sizeObj.width / 600;

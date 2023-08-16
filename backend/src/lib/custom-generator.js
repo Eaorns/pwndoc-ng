@@ -13,6 +13,13 @@ exports.apply = apply;
 
 var filters = {};
 
+expressions.filters.cveSlider = function(input, score) {
+    if (score == undefined || score < 0 || score > 10)
+        score = 0;
+
+    return "/app/images/sliders/Slider_groen-rood_" + Math.round(score)*10 + ".png";
+}
+
 
 // Count vulnerability by category
 // Example: {findings | countCategory: 'MyWebCategory'}
