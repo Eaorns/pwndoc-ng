@@ -20,6 +20,11 @@ expressions.filters.cveSlider = function(input, score) {
     return "/app/images/sliders/Slider_groen-rood_" + Math.round(score)*10 + ".png";
 }
 
+expressions.filters.cveNumber = function(input, score) {
+    console.log(input, score);
+    return `${' '.repeat(Math.round(score)*6)}${score}`;
+}
+
 
 // Count vulnerability by category
 // Example: {findings | countCategory: 'MyWebCategory'}
