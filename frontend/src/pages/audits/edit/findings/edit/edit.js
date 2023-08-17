@@ -206,6 +206,7 @@ export default {
             .onOk(() => {
                 AuditService.deleteFinding(this.auditId, this.findingId)
                 .then(() => {
+                    console.log(this);
                     Notify.create({
                         message: $t('msg.findingDeleteOk'),
                         color: 'positive',
@@ -213,13 +214,16 @@ export default {
                         position: 'top-right'
                     })
                     this.findingOrig = this.finding
+
+                    // Find the index of the just deleted element
                     var currentIndex = this.$parent.audit.findings.findIndex(e => e._id === this.findingId)
-                    if (this.$parent.audit.findings.length === 1)
+                    this.$parent.audit.findings.splice(currentIndex, 1)
+                    if (this.$parent.audit.findings.length === 0)
                         this.$router.push(`/audits/${this.$parent.auditId}/findings/add`)
-                    else if (currentIndex === this.$parent.audit.findings.length - 1)
+                    else if (currentIndex === this.$parent.audit.findings.length)
                         this.$router.push(`/audits/${this.$parent.auditId}/findings/${this.$parent.audit.findings[currentIndex - 1]._id}`)
                     else
-                        this.$router.push(`/audits/${this.$parent.auditId}/findings/${this.$parent.audit.findings[currentIndex + 1]._id}`)
+                        this.$router.push(`/audits/${this.$parent.auditId}/findings/${this.$parent.audit.findings[currentIndex]._id}`)
                 })
                 .catch((err) => {
                     Notify.create({

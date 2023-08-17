@@ -170,6 +170,7 @@ export default {
                 AuditService.createFinding(this.auditId, finding)
                 .then(() => {
                     this.findingTitle = "";
+                    this.$parent.audit.findings.push(finding)
                     Notify.create({
                         message: $t('msg.findingCreateOk'),
                         color: 'positive',
@@ -224,6 +225,7 @@ export default {
                 AuditService.createFinding(this.auditId, finding)
                 .then(() => {
                     this.findingTitle = "";
+                    this.$parent.audit.findings.push(finding)
                     Notify.create({
                         message: $t('msg.findingCreateOk'),
                         color: 'positive',
