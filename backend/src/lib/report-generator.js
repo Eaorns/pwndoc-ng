@@ -16,6 +16,7 @@ var $t
 
 // Generate document with docxtemplater
 async function generateDoc(audit) {
+    console.log(audit.customFields);
     var templatePath = `${__basedir}/../report-templates/${audit.template.name}.${audit.template.ext || 'docx'}`
     var content = fs.readFileSync(templatePath, "binary");
 
@@ -29,7 +30,7 @@ async function generateDoc(audit) {
 
     var opts = {};
     opts.getImage = function(tagValue, tagName) {
-        if (tagName.split(' ')[0] == "sliderImage") {
+        if (tagName.split(' ')[0].startsWith("sliderImage")) {
             return fs.readFileSync(tagValue);
         }
         if (tagValue !== "undefined") {
@@ -57,9 +58,17 @@ async function generateDoc(audit) {
                     width = 400;
                 }
             }
-            else if (tagName.split(' ')[0] == "sliderImage") {
+            else if (tagName.split(' ')[0] == "sliderImage.cvss") {
                 width = 220;
                 height = 20;
+            }
+            else if (tagName.split(' ')[0] == "sliderImage.kir") {
+                width = 250;
+                height = 20;
+            }
+            else if (tagName.split(' ')[0] == "sliderImage.rnv") {
+                width = 500;
+                height = 30;
             }
             else if (sizeObj.width > 600) {
                 var divider = sizeObj.width / 600;
@@ -229,23 +238,28 @@ expressions.filters.fromTo = function(start, end, locale) {
     const start_date = new Date(start);
     const end_date = new Date(end);
     let options = {}, start_str = '', end_str = '';
-    let str = "from {0} to {1}";
 
     if (start_date == "Invalid Date" || end_date == "Invalid Date") return start;
 
-    options = {day: '2-digit', month: '2-digit', year: 'numeric'};
+    if (start_date.getDay() + 1 == end_date.getDay()) {
+        var str = "on {0} and {1}"
+    } else {
+        var str = "from {0} to {1}";
+    }
+
+    options = {weekday: "long", day: 'numeric', month: 'long', year: 'numeric'};
     end_str = end_date.toLocaleDateString(locale, options);
 
     if (start_date.getYear() != end_date.getYear()) {
-        options = {day: '2-digit', month: '2-digit', year: 'numeric'};
+        options = {weekday: "long", day: 'numeric', month: 'long', year: 'numeric'};
         start_str = start_date.toLocaleDateString(locale, options);
     }
     else if (start_date.getMonth() != end_date.getMonth()) {
-        options = {day: '2-digit', month: '2-digit'};
+        options = {weekday: "long", day: 'numeric', month: 'long'};
         start_str = start_date.toLocaleDateString(locale, options);
     }
     else if (start_date.getDay() != end_date.getDay()) {
-        options = {day: '2-digit'};
+        options = {weekday: "long", day: 'numeric'};
         start_str = start_date.toLocaleDateString(locale, options);
     }
     else {

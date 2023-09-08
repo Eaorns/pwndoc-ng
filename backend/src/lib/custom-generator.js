@@ -1,4 +1,9 @@
 var expressions = require('angular-expressions');
+var translate = require('../translate')
+
+var numbers = {'nl': ['nul', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 
+                      'acht', 'negen', 'tien', 'elf', 'twaalf', 'dertien', 'veertien', 
+                      'vijftien', 'zestien', 'zeventien', 'achtien', 'negentien', 'twintig']};
 
 // Apply all customs functions
 function apply(data) {
@@ -14,6 +19,7 @@ exports.apply = apply;
 var filters = {};
 
 expressions.filters.cveSlider = function(input, score) {
+    score = typeof score == "String" ? parseInt(score) : score;
     if (score == undefined || score < 0 || score > 10)
         score = 0;
 
@@ -21,10 +27,112 @@ expressions.filters.cveSlider = function(input, score) {
 }
 
 expressions.filters.cveNumber = function(input, score) {
-    console.log(input, score);
     return `${' '.repeat(Math.round(score)*6)}${score}`;
 }
 
+expressions.filters.check = function(input, check) {
+    return (input && input.some((x) => x == check));
+}
+
+expressions.filters.condCheck = function(input) {
+    return `<w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /><w:jc w:val="center" /></w:pPr><w:r>${(input) ? '<w:sym w:font="Wingdings" w:char="F0FC" />' : ''}</w:r></w:p>`;
+}
+
+expressions.filters.extractTargets = function(input) {
+    return input.match(/((\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?)|([-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g) ?? [];
+}
+
+expressions.filters.generateTable = function(input) {
+    tw = 5100
+    cw = tw / 6
+    
+    // https://docxperiments.readthedocs.io/en/latest/synthesis/documentxml.html
+    pre = `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid" /><w:tblW w:w="${tw}" w:type="pct" /><w:tblBorders><w:top w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:left w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:bottom w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:right w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideH w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideV w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /></w:tblBorders><w:tblLayout w:type="fixed" /></w:tblPr><w:tblGrid><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="${tw}" w:type="dxa" /><w:gridSpan w:val="6" /><w:shd w:val="clear" w:color="auto" w:fill="2DA5DE" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:rPr><w:color w:val="FFFFFF" w:themeColor="background1" /></w:rPr><w:t xml:space="preserve">Doelobjecten</w:t></w:r></w:p></w:tc></w:tr>`;
+    post = '</w:tbl>';
+
+    // Split array into equally sized portions
+    var rows = []
+    while (input.length > 0)
+        rows.push(input.splice(0, 6));
+    
+    out = "";
+    for (row of rows) {
+        out += "<w:tr>";
+        l = (row.length == 6) ? false : row.length-1;
+        for ([i, t] of row.entries()) {
+            if (l && i == l)
+                out += `<w:tc><w:tcPr><w:tcW w:w="${cw*(6-l)}" w:type="dxa" /><w:gridSpan w:val="${6-l}" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${t}</w:t></w:r></w:p></w:tc>`;
+            else
+                out += `<w:tc><w:tcPr><w:tcW w:w="${cw}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${t}</w:t></w:r></w:p></w:tc>`;
+        }
+        out += "</w:tr>"
+    }
+
+    return pre + out + post;
+}
+
+function count_findings_per_severity(findings, severity) {
+    return findings.filter((finding) => finding.cvss['environmentalSeverity'] == severity).length;
+}
+
+expressions.filters.findingCount = function(input, severity) {
+    findings = count_findings_per_severity(input, severity);
+    return (findings > 0) ? findings : '-';
+}
+
+expressions.filters.findingIdLabel = function(input, severity) {
+    count = count_findings_per_severity(input, severity)
+    if (count == 0)
+        return '-';
+    if (severity == 'None') {
+        chap = 5;
+        base = 1;
+    } else {
+        chap = 4;
+        switch (severity) {
+            case 'Critical':
+                base = 1
+                break;
+            case 'High':
+                base = count_findings_per_severity(input, 'Critical') + 1;
+                break;
+            case 'Medium':
+                base = count_findings_per_severity(input, 'Critical') + 
+                       count_findings_per_severity(input, 'High') + 1;
+                break;
+            case 'Low':
+                base = count_findings_per_severity(input, 'Critical') + 
+                       count_findings_per_severity(input, 'High') + 
+                       count_findings_per_severity(input, 'Medium') + 1;
+                break;
+        }
+    }
+    switch (count) {
+        case 1:
+            return `${chap}.${base}`
+        case 2:
+            return `${chap}.${base} & ${chap}.${base+1}`
+        default:
+            return `${chap}.${base} t/m ${chap}.${base+count-1}`
+    }
+}
+
+expressions.filters.findingCountSolved = function(input, severity) {
+    if (count_findings_per_severity(input, severity) == 0)
+        return '-';
+    return input.filter((finding) => finding.cvss['environmentalSeverity'] == severity && finding.opgelost == 'Ja').length;
+}
+
+expressions.filters.spanTo = function(start, end, locale) {
+    const start_date = new Date(start);
+    const end_date = new Date(end);
+
+    if (start_date == "Invalid Date" || end_date == "Invalid Date") return start;
+
+    diff = Math.ceil(Math.abs(end_date - start_date) / (1000 * 60 * 60 * 24)) + 1; 
+    str = (diff == 1) ? "{0} day" : "{0} days";
+    return translate.translate(str).format((diff <= 20) ? numbers[locale][diff] : diff)
+}
 
 // Count vulnerability by category
 // Example: {findings | countCategory: 'MyWebCategory'}
