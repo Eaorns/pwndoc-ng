@@ -39,7 +39,7 @@ expressions.filters.condCheck = function(input) {
 }
 
 expressions.filters.extractTargets = function(input) {
-    return input.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g) ?? [];
+    return [...new Set(input.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? [];
 }
 
 expressions.filters.generateTable = function(input) {
