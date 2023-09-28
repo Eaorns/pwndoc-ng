@@ -16,7 +16,6 @@ var $t
 
 // Generate document with docxtemplater
 async function generateDoc(audit) {
-    console.log(audit.customFields);
     var templatePath = `${__basedir}/../report-templates/${audit.template.name}.${audit.template.ext || 'docx'}`
     var content = fs.readFileSync(templatePath, "binary");
 
@@ -562,6 +561,14 @@ function parser(tag) {
                 else {
                     return '';
                 }
+            }
+        }
+    }
+    if (tag === "$index") {
+        return {
+            get(scope, context) {
+                const indexes = context.scopePathItem;
+                return indexes[indexes.length - 1]+1;
             }
         }
     }
