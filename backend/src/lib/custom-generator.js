@@ -93,15 +93,15 @@ function generate_table(input, col_width, col_names) {
     // https://docxperiments.readthedocs.io/en/latest/synthesis/documentxml.html
     pre = `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid" /><w:tblW w:w="${tw}" w:type="pct" /><w:tblBorders><w:top w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:left w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:bottom w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:right w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideH w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideV w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /></w:tblBorders><w:tblLayout w:type="fixed" /></w:tblPr>`;
     pre += '<w:tblGrid>' + col_width.map((w) => ` <w:gridCol w:w="${w}" />`).join('') + '</w:tblGrid>';
-    pre += '<w:tr>' + col_width.map((w, idx) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="2DA5DE" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:rPr><w:color w:val="FFFFFF" w:themeColor="background1" /></w:rPr><w:t xml:space="preserve">${col_names[idx]}</w:t></w:r></w:p></w:tc>`).join('') + '</w:tr>' 
+    pre += '<w:tr>' + col_width.map((w, idx) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="2DA5DE" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:rPr><w:color w:val="FFFFFF" w:themeColor="background1" /><w:b w:val="true"/></w:rPr><w:t xml:space="preserve">${col_names[idx]}</w:t></w:r></w:p></w:tc>`).join('') + '</w:tr>' 
     post = '</w:tbl>';
     
     out = "";
     for (row of input) {
         out += "<w:tr>";
         for (var i = 0; i < input[0].length; i++) {
-            data = html2ooxml(row[i].replace(/(<p><\/p>)+$/, ''))
-            out += `<w:tc><w:tcPr><w:tcW w:w="${col_width[i]}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${data}</w:t></w:r></w:p></w:tc>`
+            data = html2ooxml(row[i].replace(/(<p><\/p>)+$/, '')).replaceAll(/(^<w:p>|<\/w:p>$)/gm, '')
+            out += `<w:tc><w:tcPr><w:tcW w:w="${col_width[i]}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr>${data}</w:p></w:tc>`
         }
         out += "</w:tr>";
     }
