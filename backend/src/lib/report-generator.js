@@ -266,7 +266,7 @@ expressions.filters.fromTo = function(start, end, locale) {
         str = "on {0}";
     }
 
-    return translate.translate(str).format(start_str, end_str);
+    return translate.translate(str, locale).format(start_str, end_str);
 }
 
 // Group input elements by an attribute: {#findings | groupBy: 'severity'}{title}{/findings | groupBy: 'severity'}

@@ -191,7 +191,7 @@ expressions.filters.spanTo = function(start, end, locale) {
 
     diff = Math.ceil(Math.abs(end_date - start_date) / (1000 * 60 * 60 * 24)) + 1; 
     str = (diff == 1) ? "{0} day" : "{0} days";
-    return translate.translate(str).format((diff <= 20) ? numbers[locale][diff] : diff)
+    return translate.translate(str, locale).format((diff <= 20) ? numbers[locale][diff] : diff)
 }
 
 // Count vulnerability by category
