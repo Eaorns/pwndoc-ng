@@ -1,5 +1,6 @@
 var expressions = require('angular-expressions');
 var translate = require('../translate')
+var html2ooxml = require('./html2ooxml');
 
 var numbers = {'nl': ['nul', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 
                       'acht', 'negen', 'tien', 'elf', 'twaalf', 'dertien', 'veertien', 
@@ -42,7 +43,7 @@ expressions.filters.extractTargets = function(input) {
     return [...new Set(input.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? [];
 }
 
-expressions.filters.generateTable = function(input) {
+expressions.filters.generateTargetsTable = function(input) {
     tw = 5100
     cw = tw / 6
     
@@ -66,6 +67,65 @@ expressions.filters.generateTable = function(input) {
                 out += `<w:tc><w:tcPr><w:tcW w:w="${cw}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${t}</w:t></w:r></w:p></w:tc>`;
         }
         out += "</w:tr>"
+    }
+
+    return pre + out + post;
+}
+
+expressions.filters.extractTable = function(input) {
+    if (input == null)
+        return [];
+    table = input[0].text.match(/<table>(.*)<\/table>/gm);
+    if (table == null)
+        return [];
+    table = table[0];
+    rows = table.match(/<tr>(.*?)<\/tr>/gm);
+    if (rows == null)
+        return [];
+    // Somehow, without the double map (first using regular 'match' instead of 'matchAll'),
+    // the whole string got matched, not just the capture group.
+    return rows.map((row) => [...row.matchAll(/<td.*?>(.*?)<\/td>/gm)].map((match) => match[1]));
+}
+
+expressions.filters.generateOutdatedSoftwareTable = function(input) {
+    if (input == null || input.length == 0)
+        return '';
+    cols = input[0].length;
+    switch (cols) {
+        case 2:
+            var tw = 4000;
+            var col_width = [1200, 2800];
+            var col_names = ['Doelobjecten', 'Geïnstalleerde versie/Oplossing'];
+            break;
+        case 3:
+            var tw = 5100;
+            var col_width = [1200, 2100, 1800];
+            var col_names = ['Kwetsbaar product', 'Geïnstalleerde versie/Oplossing', 'Doelobjecten'];
+            break;
+        case 4:
+            var tw = 5100;
+            var col_width = [1200, 1800, 600, 1500];
+            var col_names = ['Kwetsbaar product', 'Geïnstalleerde versie/Oplossing', 'CVSS', 'Doelobjecten'];
+            break;
+        default:
+            console.log(`Outdated Software table has invalid number of columns (${cols})! not parsing. Data: ${input}`);
+            return "";
+    }
+    
+    // https://docxperiments.readthedocs.io/en/latest/synthesis/documentxml.html
+    pre = `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid" /><w:tblW w:w="${tw}" w:type="pct" /><w:tblBorders><w:top w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:left w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:bottom w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:right w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideH w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideV w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /></w:tblBorders><w:tblLayout w:type="fixed" /></w:tblPr>`;
+    pre += '<w:tblGrid>' + col_width.map((w) => ` <w:gridCol w:w="${w}" />`).join('') + '</w:tblGrid>';
+    pre += '<w:tr>' + col_width.map((w, idx) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="2DA5DE" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:rPr><w:color w:val="FFFFFF" w:themeColor="background1" /></w:rPr><w:t xml:space="preserve">${col_names[idx]}</w:t></w:r></w:p></w:tc>`).join('') + '</w:tr>' 
+    post = '</w:tbl>';
+    
+    out = "";
+    for (row of input) {
+        out += "<w:tr>";
+        for (var i = 0; i < cols; i++) {
+            data = html2ooxml(row[i].replace(/(<p><\/p>)+$/, ''))
+            out += `<w:tc><w:tcPr><w:tcW w:w="${col_width[i]}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${data}</w:t></w:r></w:p></w:tc>`
+        }
+        out += "</w:tr>";
     }
 
     return pre + out + post;
