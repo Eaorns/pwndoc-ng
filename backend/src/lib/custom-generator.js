@@ -99,7 +99,7 @@ function generate_table(input, col_width, col_names) {
     out = "";
     for (row of input) {
         out += "<w:tr>";
-        for (var i = 0; i < cols; i++) {
+        for (var i = 0; i < input[0].length; i++) {
             data = html2ooxml(row[i].replace(/(<p><\/p>)+$/, ''))
             out += `<w:tc><w:tcPr><w:tcW w:w="${col_width[i]}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${data}</w:t></w:r></w:p></w:tc>`
         }
