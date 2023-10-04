@@ -57,6 +57,20 @@
 						<q-item-section>{{$t('networkScan')}}</q-item-section>
 					</q-item>
 
+					<q-list v-for="section of audit.sections" :key="section._id">
+						<q-item :to="'/audits/'+auditId+'/sections/'+section._id">
+							<q-item-section avatar>
+								<q-icon :name="getSectionIcon(section)"></q-icon>
+							</q-item-section>
+							<q-item-section>
+								<span>{{section.name}}</span>
+							</q-item-section>
+						</q-item>
+						<div class="row">
+							<div v-for="(user,idx) in sectionUsers" :key="idx" v-if="user.section === section._id" class="col multi-colors-bar" :style="{background:user.color}" />
+						</div>
+					</q-list>
+
 					<div class="row">
 						<div v-for="(user,idx) in networkUsers" :key="idx" class="col multi-colors-bar" :style="{background:user.color}" />
 					</div>
@@ -185,19 +199,6 @@
 						</div>
 						<q-separator class="q-my-sm" />
 					</div>
-					<q-list v-for="section of audit.sections" :key="section._id">
-						<q-item :to="'/audits/'+auditId+'/sections/'+section._id">
-							<q-item-section avatar>
-								<q-icon :name="getSectionIcon(section)"></q-icon>
-							</q-item-section>
-							<q-item-section>
-								<span>{{section.name}}</span>
-							</q-item-section>
-						</q-item>
-						<div class="row">
-							<div v-for="(user,idx) in sectionUsers" :key="idx" v-if="user.section === section._id" class="col multi-colors-bar" :style="{background:user.color}" />
-						</div>
-					</q-list>
 				</q-list>
 			</template>
 			<template v-slot:after>
