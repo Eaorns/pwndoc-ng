@@ -87,31 +87,9 @@ expressions.filters.extractTable = function(input) {
     return rows.map((row) => [...row.matchAll(/<td.*?>(.*?)<\/td>/gm)].map((match) => match[1]));
 }
 
-expressions.filters.generateOutdatedSoftwareTable = function(input) {
-    if (input == null || input.length == 0)
-        return '';
-    cols = input[0].length;
-    switch (cols) {
-        case 2:
-            var tw = 4000;
-            var col_width = [1200, 2800];
-            var col_names = ['Doelobjecten', 'Geïnstalleerde versie/Oplossing'];
-            break;
-        case 3:
-            var tw = 5100;
-            var col_width = [1200, 2100, 1800];
-            var col_names = ['Kwetsbaar product', 'Geïnstalleerde versie/Oplossing', 'Doelobjecten'];
-            break;
-        case 4:
-            var tw = 5100;
-            var col_width = [1200, 1800, 600, 1500];
-            var col_names = ['Kwetsbaar product', 'Geïnstalleerde versie/Oplossing', 'CVSS', 'Doelobjecten'];
-            break;
-        default:
-            console.log(`Outdated Software table has invalid number of columns (${cols})! not parsing. Data: ${input}`);
-            return "";
-    }
-    
+function generate_table(input, col_width, col_names) {
+    tw = col_width.reduce((v, a) => v + a, 0);
+
     // https://docxperiments.readthedocs.io/en/latest/synthesis/documentxml.html
     pre = `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid" /><w:tblW w:w="${tw}" w:type="pct" /><w:tblBorders><w:top w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:left w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:bottom w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:right w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideH w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideV w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /></w:tblBorders><w:tblLayout w:type="fixed" /></w:tblPr>`;
     pre += '<w:tblGrid>' + col_width.map((w) => ` <w:gridCol w:w="${w}" />`).join('') + '</w:tblGrid>';
@@ -129,6 +107,39 @@ expressions.filters.generateOutdatedSoftwareTable = function(input) {
     }
 
     return pre + out + post;
+}
+
+expressions.filters.generateOutdatedSoftwareTable = function(input) {
+    if (input == null || input.length == 0)
+        return '';
+
+    switch (input[0].length) {
+        case 2:
+            var col_width = [1200, 2800];
+            var col_names = ['Doelobjecten', 'Geïnstalleerde versie/Oplossing'];
+            break;
+        case 3:
+            var col_width = [1200, 2100, 1800];
+            var col_names = ['Kwetsbaar product', 'Geïnstalleerde versie/Oplossing', 'Doelobjecten'];
+            break;
+        case 4:
+            var col_width = [1200, 1800, 600, 1500];
+            var col_names = ['Kwetsbaar product', 'Geïnstalleerde versie/Oplossing', 'CVSS', 'Doelobjecten'];
+            break;
+        default:
+            console.log(`Outdated Software table has invalid number of columns (${input[0].length})! not parsing. Data: ${input}`);
+            return "";
+    }
+    
+    return generate_table(input, col_width, col_names)
+}
+
+expressions.filters.generateGlobalTargetsTable = function(input) {
+    return generate_table(input, [800, 1300, 500, 2500], ['IP-adres', 'systeemnaam / URL', 'IPv6', 'Omschrijving'])
+}
+
+expressions.filters.generateExceptionsTable = function(input) {
+    return generate_table(input, [1800, 3300], ['Doelobject', 'Niet onderzocht in verband met'])
 }
 
 function count_findings_per_severity(findings, severity) {
@@ -192,6 +203,10 @@ expressions.filters.spanTo = function(start, end, locale) {
     diff = Math.ceil(Math.abs(end_date - start_date) / (1000 * 60 * 60 * 24)) + 1; 
     str = (diff == 1) ? "{0} day" : "{0} days";
     return translate.translate(str, locale).format((diff <= 20) ? numbers[locale][diff] : diff)
+}
+
+expressions.filters.addChar = function(input, char) {
+    return (input.slice(-1) == char) ? input : input + char;
 }
 
 // Count vulnerability by category
