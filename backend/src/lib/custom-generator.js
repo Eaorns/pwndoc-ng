@@ -20,11 +20,11 @@ exports.apply = apply;
 var filters = {};
 
 expressions.filters.cveSlider = function(input, score) {
+    score = typeof score == 'object' ? score.value : score;
     score = typeof score == "String" ? parseInt(score) : score;
     console.log("SCORE", score);
-    if (typeof score == 'object' && 'value' in score)
-        score = score.value;
-    if (score == undefined || typeof score != 'number' || score < 0 || score > 10)
+
+    if (score == undefined || score < 0 || score > 10)
         score = 0;
 
     return "/app/images/sliders/Slider_groen-rood_" + Math.round(score)*10 + ".png";
