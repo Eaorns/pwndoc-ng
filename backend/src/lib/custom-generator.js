@@ -21,7 +21,10 @@ var filters = {};
 
 expressions.filters.cveSlider = function(input, score) {
     score = typeof score == "String" ? parseInt(score) : score;
-    if (score == undefined || score < 0 || score > 10)
+    console.log("SCORE", score);
+    if (typeof score == 'object' && 'value' in score)
+        score = score.value;
+    if (score == undefined || typeof score != 'number' || score < 0 || score > 10)
         score = 0;
 
     return "/app/images/sliders/Slider_groen-rood_" + Math.round(score)*10 + ".png";
@@ -43,32 +46,149 @@ expressions.filters.extractTargets = function(input) {
     return [...new Set(input.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? [];
 }
 
-expressions.filters.generateTargetsTable = function(input) {
-    tw = 5100
-    cw = tw / 6
-    
+expressions.filters.generateTargetsTable = function(input) {    
+    // source: https://gist.github.com/aminnj/5ca372aa2def72fb017b531c894afdca
+    char_weights = {
+        " ": 4.4453125,  "!": 4.4453125,  '"': 5.6796875, 
+        "#": 8.8984375,  "$": 8.8984375,  "%": 14.2265625, 
+        "&": 10.671875,  "'": 3.0546875,  "(": 5.328125, 
+        ")": 5.328125,   "*": 6.2265625,  "+": 9.34375, 
+        ",": 4.4453125,  "-": 5.328125,   ".": 4.4453125, 
+        "/": 4.4453125,  "0": 8.8984375,  "1": 7.7228125, 
+        "2": 8.8984375,  "3": 8.8984375,  "4": 8.8984375, 
+        "5": 8.8984375,  "6": 8.8984375,  "7": 8.8984375, 
+        "8": 8.8984375,  "9": 8.8984375,  ":": 4.4453125, 
+        ";": 4.4453125,  "<": 9.34375,    "=": 9.34375, 
+        ">": 9.34375,    "?": 8.8984375,  "@": 16.2421875, 
+        "A": 10.671875,  "B": 10.671875,  "C": 11.5546875, 
+        "D": 11.5546875, "E": 10.671875,  "F": 9.7734375, 
+        "G": 12.4453125, "H": 11.5546875, "I": 4.4453125, 
+        "J": 8,          "K": 10.671875,  "L": 8.8984375, 
+        "M": 13.328125,  "N": 11.5546875, "O": 12.4453125, 
+        "P": 10.671875,  "Q": 12.4453125, "R": 11.5546875, 
+        "S": 10.671875,  "T": 9.7734375,  "U": 11.5546875, 
+        "V": 10.671875,  "W": 15.1015625, "X": 10.671875, 
+        "Y": 10.671875,  "Z": 9.7734375,  "[": 4.4453125, 
+       "\\": 4.4453125,  "]": 4.4453125,  "^": 7.5078125, 
+        "_": 8.8984375,  "`": 5.328125,   "a": 8.8984375, 
+        "b": 8.8984375,  "c": 8,          "d": 8.8984375, 
+        "e": 8.8984375,  "f": 4.15921875, "g": 8.8984375, 
+        "h": 8.8984375,  "i": 3.5546875,  "j": 3.5546875, 
+        "k": 8,          "l": 3.5546875,  "m": 13.328125, 
+        "n": 8.8984375,  "o": 8.8984375,  "p": 8.8984375, 
+        "q": 8.8984375,  "r": 5.328125,   "s": 8, 
+        "t": 4.4453125,  "u": 8.8984375,  "v": 8, 
+        "w": 11.5546875, "x": 8,          "y": 8, 
+        "z": 8,          "{": 5.34375,    "|": 4.15625, 
+        "}": 5.34375,    "~": 9.34375
+    }
+
+    let calc_width = (s) => s.split('').map((c) => char_weights[c]).reduce((p, v) => p + v, 0)
+
+    num_vals = input.length;
+    vals = input.map((x) => [x, calc_width(x)]).sort((a, b) => a[1] - b[1]);
+    console.log(vals);
+
+    // bins = [[], [], [], [], [], []];
+    // overflow = [];
+    // for (val of vals) {
+    //     // First, approximate
+    //     bin = Math.ceil(val[1] / (col_char_limit + bet_char_limit));
+    //     // Then, check if actually correct or should be adjusted
+    //     if (bin * col_char_limit + (bin-1) * bet_char_limit < val[1])
+    //         bin++;
+    //     if (bin >= 7)
+    //         overflow.push(val[0]);
+    //     else
+    //         bins[bin-1].push(val[0]);
+    // }
+    // // bins = bins.reverse();
+    // console.log(bins);
+    // console.log(overflow);
+
+    // num_in_bins = num_vals - overflow.length;
+    // while (num_in_bins > 0) {
+    //     cols_left = 6;
+    //     cols_tried = cols_left;
+    //     row = [];
+    //     while (cols_left > 0 && cols_tried > 0) {
+    //         if (bins[cols_tried-1].length > 0) {
+    //             row.push([bins[cols_tried-1].pop(), cols_tried]);
+    //             cols_left -= cols_tried;
+    //             cols_tried = cols_left;
+    //             num_in_bins--;
+    //         } else {
+    //             cols_tried--;
+    //         }
+    //     }
+    //     if (cols_left > 0) {
+    //         row[row.length-1][1] += cols_left;
+    //     }
+    // }
+
+
+    median = vals[Math.floor(vals.length*.6)][1]; // Not 'real' median, slight offset
+    console.log("median", median);
+    var num_cols = 6;
+    bet_char_limit = char_weights["'"]*6
+    max_char_limit = char_weights["'"]*238
+    col_char_limit = 0;
+    for (; num_cols > 1; num_cols--) {
+        col_char_limit = (max_char_limit - bet_char_limit * (num_cols-1)) / num_cols;
+        if (col_char_limit > median)
+            break;
+    }
+
+    console.log("COLS", num_cols, col_char_limit, bet_char_limit);
+    vals = vals.map(function(val) {
+        // First, approximate
+        colspan = Math.ceil(val[1] / (col_char_limit + bet_char_limit));
+        // Then, check if actually correct or should be adjusted
+        if (colspan * col_char_limit + (colspan-1) * bet_char_limit < val[1])
+            colspan++;
+        return [val[0], Math.min(colspan, num_cols)];
+    });
+ 
+    console.log(vals);
+    rows = [];
+    while (vals.length > 0) {
+        cols_left = num_cols;
+        row = []
+        while(cols_left > 0 && vals.length > 0) {
+            if (vals[0][1] <= cols_left) {
+                cols_left -= vals[0][1]
+                row.push(vals.shift())
+            } else {
+                row[row.length-1][1] += cols_left;
+                break;
+            }
+        }
+        if (vals.length == 0)
+            row[row.length-1][1] += cols_left;
+
+        rows.push(row);
+    }
+    console.log(rows);
+
+    tw = 5100;
+    cw = tw / num_cols;
+
     // https://docxperiments.readthedocs.io/en/latest/synthesis/documentxml.html
-    pre = `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid" /><w:tblW w:w="${tw}" w:type="pct" /><w:tblBorders><w:top w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:left w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:bottom w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:right w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideH w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideV w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /></w:tblBorders><w:tblLayout w:type="fixed" /></w:tblPr><w:tblGrid><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /><w:gridCol w:w="${cw}" /></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="${tw}" w:type="dxa" /><w:gridSpan w:val="6" /><w:shd w:val="clear" w:color="auto" w:fill="2DA5DE" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:rPr><w:color w:val="FFFFFF" w:themeColor="background1" /></w:rPr><w:t xml:space="preserve">Doelobjecten</w:t></w:r></w:p></w:tc></w:tr>`;
+    pre = `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid" /><w:tblW w:w="${tw}" w:type="pct" /><w:tblBorders><w:top w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:left w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:bottom w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:right w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideH w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideV w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /></w:tblBorders><w:tblLayout w:type="fixed" /></w:tblPr>`;
+    pre += '<w:tblGrid>' + ` <w:gridCol w:w="${cw}" />`.repeat(num_cols) + '</w:tblGrid>';
+    pre += `<w:tr><w:tc><w:tcPr><w:tcW w:w="${tw}" w:type="dxa" /><w:gridSpan w:val="${num_cols}" /><w:shd w:val="clear" w:color="auto" w:fill="2DA5DE" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:rPr><w:color w:val="FFFFFF" w:themeColor="background1" /></w:rPr><w:t xml:space="preserve">Doelobjecten</w:t></w:r></w:p></w:tc></w:tr>`
     post = '</w:tbl>';
 
-    // Split array into equally sized portions
-    var rows = []
-    while (input.length > 0)
-        rows.push(input.splice(0, 6));
-    
-    out = "";
+    out = ""
     for (row of rows) {
         out += "<w:tr>";
-        l = (row.length == 6) ? false : row.length-1;
-        for ([i, t] of row.entries()) {
-            if (l && i == l)
-                out += `<w:tc><w:tcPr><w:tcW w:w="${cw*(6-l)}" w:type="dxa" /><w:gridSpan w:val="${6-l}" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${t}</w:t></w:r></w:p></w:tc>`;
-            else
-                out += `<w:tc><w:tcPr><w:tcW w:w="${cw}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${t}</w:t></w:r></w:p></w:tc>`;
+        for (col of row) {
+            console.log(cw*col[1], col[1], col[0]);
+            out += `<w:tc><w:tcPr><w:tcW w:w="${cw*col[1]}" w:type="dxa" /><w:gridSpan w:val="${col[1]}" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${col[0]}</w:t></w:r></w:p></w:tc>`;
         }
         out += "</w:tr>"
     }
-
+    
     return pre + out + post;
 }
 
