@@ -43,7 +43,24 @@ expressions.filters.condCheck = function(input) {
 }
 
 expressions.filters.extractTargets = function(input) {
-    return [...new Set(input.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? [];
+    lines = [...input.matchAll(/<p>(.*?)<\/p>/gm)].map((match) => match[1]) ?? []
+    console.log(">> LINES ", lines);
+    out = []
+    for (line of lines) {
+        console.log(">> L ", line);
+        if (line.length == 0)
+            continue;
+        targets = [...new Set(line.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? []
+        console.log(">> T ", targets, targets.length);
+        if (targets.length == 0)
+            out.push(line)
+            // continue
+        else
+            out = out.concat(targets)
+    }
+    console.log(out);
+    return out;
+    // return [...new Set(input.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? [];
 }
 
 expressions.filters.generateTargetsTable = function(input) {    
