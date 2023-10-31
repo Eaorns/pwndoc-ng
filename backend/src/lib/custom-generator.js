@@ -235,8 +235,7 @@ expressions.filters.generateExceptionsTable = function(input) {
 }
 
 function count_findings_per_severity(findings, severity) {
-    return findings.filter((finding) => finding.cvss['baseSeverity'] == severity).length + 
-          (severity == 'None') ? findings.filter((finding) => finding.cvss['baseSeverity'] == '').length : 0;
+    return findings.filter((finding) => finding.cvss['baseSeverity'] == severity).length + ((severity == 'None') ? findings.filter((finding) => finding.cvss['baseSeverity'] == '').length : 0);
 }
 
 expressions.filters.findingCount = function(input, severity) {
