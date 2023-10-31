@@ -44,23 +44,18 @@ expressions.filters.condCheck = function(input) {
 
 expressions.filters.extractTargets = function(input) {
     lines = [...input.matchAll(/<p>(.*?)<\/p>/gm)].map((match) => match[1]) ?? []
-    console.log(">> LINES ", lines);
     out = []
     for (line of lines) {
-        console.log(">> L ", line);
         if (line.length == 0)
             continue;
         targets = [...new Set(line.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? []
-        console.log(">> T ", targets, targets.length);
         if (targets.length == 0)
             out.push(line)
-            // continue
         else
             out = out.concat(targets)
     }
     console.log(out);
     return out;
-    // return [...new Set(input.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? [];
 }
 
 expressions.filters.generateTargetsTable = function(input) {    
@@ -104,48 +99,8 @@ expressions.filters.generateTargetsTable = function(input) {
 
     num_vals = input.length;
     vals = input.map((x) => [x, calc_width(x)]).sort((a, b) => a[1] - b[1]);
-    console.log(vals);
-
-    // bins = [[], [], [], [], [], []];
-    // overflow = [];
-    // for (val of vals) {
-    //     // First, approximate
-    //     bin = Math.ceil(val[1] / (col_char_limit + bet_char_limit));
-    //     // Then, check if actually correct or should be adjusted
-    //     if (bin * col_char_limit + (bin-1) * bet_char_limit < val[1])
-    //         bin++;
-    //     if (bin >= 7)
-    //         overflow.push(val[0]);
-    //     else
-    //         bins[bin-1].push(val[0]);
-    // }
-    // // bins = bins.reverse();
-    // console.log(bins);
-    // console.log(overflow);
-
-    // num_in_bins = num_vals - overflow.length;
-    // while (num_in_bins > 0) {
-    //     cols_left = 6;
-    //     cols_tried = cols_left;
-    //     row = [];
-    //     while (cols_left > 0 && cols_tried > 0) {
-    //         if (bins[cols_tried-1].length > 0) {
-    //             row.push([bins[cols_tried-1].pop(), cols_tried]);
-    //             cols_left -= cols_tried;
-    //             cols_tried = cols_left;
-    //             num_in_bins--;
-    //         } else {
-    //             cols_tried--;
-    //         }
-    //     }
-    //     if (cols_left > 0) {
-    //         row[row.length-1][1] += cols_left;
-    //     }
-    // }
-
 
     median = vals[Math.floor(vals.length*.6)][1]; // Not 'real' median, slight offset
-    console.log("median", median);
     var num_cols = 6;
     bet_char_limit = char_weights["'"]*6
     max_char_limit = char_weights["'"]*238
@@ -156,7 +111,6 @@ expressions.filters.generateTargetsTable = function(input) {
             break;
     }
 
-    console.log("COLS", num_cols, col_char_limit, bet_char_limit);
     vals = vals.map(function(val) {
         // First, approximate
         colspan = Math.ceil(val[1] / (col_char_limit + bet_char_limit));
@@ -166,26 +120,27 @@ expressions.filters.generateTargetsTable = function(input) {
         return [val[0], Math.min(colspan, num_cols)];
     });
  
-    console.log(vals);
     rows = [];
     while (vals.length > 0) {
         cols_left = num_cols;
-        row = []
-        while(cols_left > 0 && vals.length > 0) {
-            if (vals[0][1] <= cols_left) {
-                cols_left -= vals[0][1]
-                row.push(vals.shift())
+        row = [];
+        while (cols_left > 0) {
+            if (vals.length > 0) {
+                if (vals[0][1] <= cols_left) {
+                    cols_left -= vals[0][1];
+                    row.push(vals.shift());
+                } else {
+                    row = row.concat(Array(cols_left).fill(['', 1]));
+                    break;
+                }
             } else {
-                row[row.length-1][1] += cols_left;
+                row = row.concat(Array(cols_left).fill(['', 1]));
                 break;
             }
         }
-        if (vals.length == 0)
-            row[row.length-1][1] += cols_left;
 
         rows.push(row);
     }
-    console.log(rows);
 
     tw = 5100;
     cw = tw / num_cols;
@@ -344,6 +299,10 @@ expressions.filters.spanTo = function(start, end, locale) {
 
 expressions.filters.addChar = function(input, char) {
     return (input.slice(-1) == char) ? input : input + char;
+}
+
+expressions.filters.removeChar = function(input, char) {
+    return (input.slice(-1) == char) ? input.substring(0, input.length-1) : input;
 }
 
 // Count vulnerability by category
