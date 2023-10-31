@@ -235,7 +235,8 @@ expressions.filters.generateExceptionsTable = function(input) {
 }
 
 function count_findings_per_severity(findings, severity) {
-    return findings.filter((finding) => finding.cvss['environmentalSeverity'] == severity).length;
+    return findings.filter((finding) => finding.cvss['baseSeverity'] == severity).length + 
+          (severity == 'None') ? findings.filter((finding) => finding.cvss['baseSeverity'] == '').length : 0;
 }
 
 expressions.filters.findingCount = function(input, severity) {
@@ -283,7 +284,7 @@ expressions.filters.findingIdLabel = function(input, severity) {
 expressions.filters.findingCountSolved = function(input, severity) {
     if (count_findings_per_severity(input, severity) == 0)
         return '-';
-    return input.filter((finding) => finding.cvss['environmentalSeverity'] == severity && finding.opgelost == 'Ja').length;
+    return input.filter((finding) => (finding.cvss['baseSeverity'] == severity || (severity == 'None' && finding.cvss['baseSeverity'] == '')) && finding.opgelost == 'Ja').length;
 }
 
 expressions.filters.spanTo = function(start, end, locale) {
