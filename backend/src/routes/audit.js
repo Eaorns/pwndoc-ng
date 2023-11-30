@@ -415,7 +415,9 @@ module.exports = function(app, io) {
                 throw ({fn: 'BadParameters', message: 'Template not defined'})
 
             var reportDoc = await reportGenerator.generateDoc(audit);
-            Response.SendFile(res, `${audit.name.replace(/[\\\/:*?"<>|]/g, "")}.${audit.template.ext || 'docx'}`, reportDoc);
+            // var audit_name = audit.name.replace(/[\\\/:*?"<>|]/g, "");
+            var audit_name = `Testrapportage-${('shortName' in audit.company && audit.company.shortName != undefined) ? audit.company.shortName : audit.company.name}-${audit.customFields.find((e) => e.customField.label == 'Projectnummer').text}-v0.1`.replace(/[\\\/:*?"<>|]/g, "");
+            Response.SendFile(res, `${audit_name}.${audit.template.ext || 'docx'}`, reportDoc);
         })
         .catch(err => {
             if (err.code === "ENOENT")
