@@ -181,7 +181,7 @@
 													size="sm"
 													square
 													:style="`background: ${getFindingColor(finding)}`"
-												>{{getFindingSeverity(finding).substring(0,1)}}</q-chip>
+												><b>{{getFindingScore(finding)}}</b></q-chip>
 											</q-item-section>
 											<q-item-section>
 												<span>{{finding.title}}</span>
@@ -367,6 +367,11 @@ export default {
 					}
 				}
 				return severity
+			},
+
+			getFindingScore: function(finding) {
+				let cvss = CVSS31.calculateCVSSFromVector(finding.cvssv3)
+				return cvss.success && cvss.baseMetricScore > 0 ? cvss.baseMetricScore : 'N';
 			},
 
 			getMenuSection: function() {
