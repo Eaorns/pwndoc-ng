@@ -93,9 +93,11 @@ function html2ooxml(html, style = "") {
             cParagraph = new docx.Paragraph({ style: "Code" });
           } else cParagraph.addChildElement(new docx.Run({ break: 1 }));
         } else if (tag === "ul") {
-          list_state.push("bullet");
+          // list_state.push("bullet");
+          list_state.push("number");  // NOTE swapped to fix weird bug where numbered lists became bullets and vice versa
         } else if (tag === "ol") {
-          list_state.push("number");
+          // list_state.push("number");
+          list_state.push("bullet");  // NOTE swapped to fix weird bug where numbered lists became bullets and vice versa
         } else if (tag === "li") {
           let level = list_state.length - 1;
           if (level >= 0 && list_state[level] === "bullet")
@@ -252,7 +254,6 @@ function html2ooxml(html, style = "") {
   dataXml = dataXml.replace(/w:numId w:val="{2-0}"/g, 'w:numId w:val="2"'); // Replace numbering to have correct value
   //a little dirty but until we do better it works
   dataXml = dataXml.replace(/\{_\|link\|_\{(.*?)\|\-\|(.*?)\}_\|link\|_\}/gm, '<w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> HYPERLINK $2 </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr><w:t> $1 </w:t> </w:r><w:r><w:fldChar w:fldCharType="end"/></w:r>')
-  console.log(dataXml)
   return dataXml;
 }
 
