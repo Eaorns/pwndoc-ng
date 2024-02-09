@@ -130,11 +130,13 @@ expressions.filters.generateTargetsTable = function(input) {
                     cols_left -= vals[0][1];
                     row.push(vals.shift());
                 } else {
-                    row = row.concat(Array(cols_left).fill(['', 1]));
+                    // row = row.concat(Array(cols_left).fill(['', 1]));  // Enable to fill remaining space with empty cells
+                    row[row.length-1][1] += cols_left;  // Enable to merge remaining space with last cell
                     break;
                 }
             } else {
-                row = row.concat(Array(cols_left).fill(['', 1]));
+                // row = row.concat(Array(cols_left).fill(['', 1]));  // Enable to fill remaining space with empty cells
+                row[row.length-1][1] += cols_left;  // Enable to merge remaining space with last cell
                 break;
             }
         }
