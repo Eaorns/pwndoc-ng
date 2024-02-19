@@ -1,5 +1,6 @@
 export default {
     generalSettings: 'Allgemeine Einstellungen',
+    dangerSettings:'Gefährliche Einstellungen',
     changeDisplayLanguage: 'Anzeigesprache',
     changeDisplayLanguageInfo: 'Wählen Sie Ihre bevorzugte Anzeigesprache',
     nav: {
@@ -358,6 +359,7 @@ export default {
     details: 'Details',
     completed: 'Vollständig',
     type: 'Type',
+    lastUpdated: 'Zuletzt Aktualisiert',
     description: 'Beschreibung',
     observation: 'Beobachtung',
     references: 'Referenzen (eine pro Zeile)',
@@ -515,6 +517,8 @@ export default {
     mandatoryReviewInfo: `Macht den Überprüfungsprozess verpflichtend. Wenn diese Option gewählt ist, kann ein Benutzer ein Audit nicht exportieren, bevor es nicht von der geforderten Anzahl von Überprüfern freigegeben wurde. 
     <br/>Die minimale Anzahl an Überprüfern wird ebenfalls genutzt, um festzulegen, ob ein Bericht als freigegeben markiert wird.`,
     minimalNumberOfReviewers: 'Minimale Anzahl an Überprüfern',
+    numberDayBeforeDelete:'Anzahl der Tage vor Löschung',
+    autoDeleteReport: 'Automatisierte Löschung von Berichten',
     saveSettings: 'Einstellungen speichern',
     revertSettingsToDefaults: 'Einstellung auf Standardwerte zurücksetzen',
     importSettings: 'Einstellungen importieren',

@@ -1,5 +1,6 @@
 export default {
     generalSettings: '通用设置',
+    dangerSettings: '危险环境',
     changeDisplayLanguage: '界面显示语言',
     changeDisplayLanguageInfo: '为平台设置默认的显示语言',
     nav: {
@@ -351,6 +352,7 @@ export default {
     details: '细节',
     completed: '已完成',
     type: '类型',
+    lastUpdated: '最后更新',
     description: '说明',
     observation: '观测',
     references: '参考资料（每条1行）',
@@ -475,6 +477,8 @@ export default {
     mandatoryReviewInfo: `使审查过程成为强制性的。 <br />激活后，用户无法导出审核，除非已获得指定数量的审核者批准。
     <br/>最少数量的审阅者还用于确定报告是否标记为已批准。`,
     minimalNumberOfReviewers: '审核者的最少数量',
+    numberDayBeforeDelete:'删除前的天数',
+    autoDeleteReport: '报告自动删除',
     saveSettings: '保存系统设置',
     revertSettingsToDefaults: '还原默认系统设置',
     importSettings: '导入系统设置',

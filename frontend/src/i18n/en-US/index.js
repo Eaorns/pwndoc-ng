@@ -1,5 +1,6 @@
 export default {
     generalSettings: 'General Settings',
+    dangerSettings: 'Dangerous Settings',
     changeDisplayLanguage: 'Display Language',
     changeDisplayLanguageInfo: 'Choose your preferred default language',
     nav: {
@@ -358,6 +359,7 @@ export default {
     details: 'Details',
     completed: 'Completed',
     type: 'Type',
+    lastUpdated: 'Last Updated',
     description: 'Description',
     observation: 'Observation',
     references: 'References (One per line)',
@@ -515,6 +517,8 @@ export default {
     mandatoryReviewInfo: `Makes the review process mandatory. When activated, a user cannot export an audit unless it has been approved by the specified number of reviewers. 
     <br/>The minimal number of reviewers is also used to determine if a report is marked as approved.`,
     minimalNumberOfReviewers: 'Minimal number of reviewers',
+    numberDayBeforeDelete:'Number of days before deletion',
+    autoDeleteReport: 'Automated Deletion of Reports',
     saveSettings: 'Save settings',
     revertSettingsToDefaults: 'Revert settings to defaults',
     importSettings: 'Import settings',

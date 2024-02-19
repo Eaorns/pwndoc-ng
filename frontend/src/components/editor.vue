@@ -643,8 +643,8 @@ export default {
   },
 
   watch: {
-    value(value) {
-      this.updateInitialeValue(value)
+    async value(value) {
+      await this.updateInitialeValue(value)
     },
     editable(value) {
       //this.editor.setOptions({ editable: this.editable });
@@ -752,9 +752,15 @@ export default {
     }
     this.updateInitialeValue(this.value)
   },
-  beforeDestroy() {
+  async beforeDestroy() {
+    while(1){
+      if(this.state==1 && this.status=='connected') break;
+      else await this.sleep(100)
+    }
+    if(this.collab){
+      this.provider.destroy()
+    }
     this.editor.destroy();
-    this.provider.destroy()
   },
   computed: {
     formatIcon: function () {
