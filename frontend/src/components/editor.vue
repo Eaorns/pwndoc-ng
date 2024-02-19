@@ -366,6 +366,19 @@
               size="sm"
               dense
               @click="
+              editor.chain().focus().toggleHeaderCell().run()
+            "
+          >
+            <q-tooltip :delay="500" content-class="text-bold"
+            >Toggle header</q-tooltip
+            >
+            <q-icon name="mdi-page-layout-header" />
+          </q-btn>
+          <q-btn
+              flat
+              size="sm"
+              dense
+              @click="
               editor.chain().focus().mergeCells().run()
             "
           >
