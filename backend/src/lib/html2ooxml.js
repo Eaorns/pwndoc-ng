@@ -196,7 +196,7 @@ function html2ooxml(html, style = "") {
           else if (level >= 0 && list_state[level] === "number")
             cParagraphProperties.numbering = { reference: 2, level: level };
           else cParagraphProperties.bullet = { level: 0 };
-          cParagraphProperties.style = `${list_state[level]}Style`;
+          cParagraphProperties.style = (list_state[level] == "bullet") ? "numberStyle" : "bulletStyle";  // NOTE also the weird number/bullet switching bug...
         } else if (tag === "code") {
           cRunProperties.style = "CodeChar";
         } else if (tag === "legend" && attribs && attribs.alt !== "undefined") {
