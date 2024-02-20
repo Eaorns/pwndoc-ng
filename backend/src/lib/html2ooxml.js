@@ -2,6 +2,91 @@ let docx = require("docx");
 let xml = require("xml");
 let htmlparser = require("htmlparser2");
 
+
+let tableDefaults = {
+  "border": {
+      "_attr": {
+        "w:val": "single",
+        "w:color": "FFFFFF",
+        "w:sz": 24,
+        "w:themeColor": "background1",
+        "w:space": 0
+    }
+  },
+  "w:rPr": {
+    "header": {
+      "w:rPr": [{
+        "w:color": {
+          "_attr": {
+            "w:val": "FFFFFF",
+            "w:themeColor": "background1"
+          }
+        }
+      },
+      {
+        "w:b": {
+          "_attr": {
+            "w:val": "true"
+          }
+        }
+      }]
+    }
+  },
+  "w:pPr": [
+    {
+      // "w:pStyle": {
+      //   "_attr": {
+      //     "w:val": "Normal-Linespacing"
+      //   }
+      // },
+      "w:spacing": {
+        "_attr": {
+          "w:after": 0,
+          "w:line": 276,
+          "w:lineRule": "auto"
+        }
+      }
+    }
+  ],
+  "w:shd": {
+    "header": {
+      "w:shd": {
+        "_attr": {
+          "w:val": "clear",
+          "w:color": "auto",
+          "w:fill": "2DA3DE"
+        }
+      }
+    },
+    "rowu": {
+      "w:shd": {
+        "_attr": {
+          "w:val": "clear",
+          "w:color": "auto",
+          "w:fill": "D9D9D9"
+        }
+      }
+    },
+    "rowe": {
+      "w:shd": {
+        "_attr": {
+          "w:val": "clear",
+          "w:color": "auto",
+          "w:fill": "F2F2F2"
+        }
+      }
+    }
+  },
+  "w:gridSpan": {
+    "w:gridSpan": {
+      "_attr": {
+        "w:val": 1
+      }
+    }
+  }
+};
+
+
 function html2ooxml(html, style = "") {
   if (html === "") return html;
   if (!html.match(/^<.+>/)) html = `<p>${html}</p>`;
@@ -208,9 +293,10 @@ function html2ooxml(html, style = "") {
 
             row.map((cell) => {
               isHeader = cell.header;
+              console.log(cell.width / widthTotal, (cell.width / widthTotal)*5100);
               tmpCells.push(new docx.TableCell({
                 width: {
-                  size: Math.round(parseFloat(cell.width / widthTotal)),
+                  size: Math.round(cell.width / widthTotal),
                   type: "pct",
                 },
                 children: cell.text,
@@ -221,6 +307,8 @@ function html2ooxml(html, style = "") {
               children: tmpCells,
               tableHeader: isHeader,
             }))
+
+
           });
           // build table and push to paragraphs array
           cParagraph = new docx.Table({
@@ -230,6 +318,8 @@ function html2ooxml(html, style = "") {
               type: "pct"
             }
           });
+
+          // console.log(JSON.stringify(cParagraph));
 
           paragraphs.push(cParagraph);
           cParagraph = null;
@@ -257,7 +347,70 @@ function html2ooxml(html, style = "") {
   let filteredXml = prepXml["w:body"].filter((e) => {
     return Object.keys(e)[0] === "w:p" || Object.keys(e)[0] === "w:tbl";
   });
+
+  let traverseTable = (obj, inTable, isHeader) => {
+    if (typeof obj != "object")  // exit condition
+      return obj;
+
+    Object.keys(obj).map((key, idx) => {
+      if (!inTable) {
+        obj[key] = traverseTable(obj[key], key == "w:tbl", isHeader);
+        return obj;
+      }
+      switch (key) {
+        case "w:tblPr":
+            obj[key] = traverseTable(obj[key], inTable, isHeader);
+            obj[key].unshift({"w:tblLayout": {"_attr": {"w:type": "fixed"}}});
+            obj[key].unshift({"w:tblStyle": {"_attr": {"w:val": "TableGrid"}}});
+            break;
+        case "w:tblBorders":
+          obj[key] = [
+            {"w:top": tableDefaults['border']},
+            {"w:left": tableDefaults['border']},
+            {"w:bottom": tableDefaults['border']},
+            {"w:right": tableDefaults['border']},
+            {"w:insideH": tableDefaults['border']},
+            {"w:insideV": tableDefaults['border']},
+          ];
+          break;
+        // case "w:tblGrid":
+        //   obj[key] = Array(obj[key].length).fill({"w:gridCol": {"_attr": {"w:w": Math.round(5100 / obj[key].length)}}});
+        //   break;
+        case "w:tr":
+          isHeader = obj[key].map((e) => ("w:trPr" in e && (Object.keys(e["w:trPr"][0]["w:tblHeader"]).length == 0 || 
+                                                            ("_attr" in e["w:trPr"][0]["w:tblHeader"] && 
+                                                             "w:val" in e["w:trPr"][0]["w:tblHeader"]["_attr"] && 
+                                                             e["w:trPr"][0]["w:tblHeader"]["_attr"]["w:val"])))
+                                 ).some((e) => e);
+          rowNumber = (isHeader) ? 0 : rowNumber + 1;
+          console.log(rowNumber, isHeader);
+          obj[key] = traverseTable(obj[key], inTable, isHeader);
+          break;
+        case "w:tcPr":
+          obj[key] = traverseTable(obj[key], inTable, isHeader)
+          obj[key].unshift(tableDefaults['w:shd'][isHeader ? 'header' : (rowNumber % 2 == 0 ? 'rowe' : 'rowu')]);
+          obj[key].unshift(tableDefaults['w:gridSpan']);
+          break;
+        case "w:pPr":
+          obj[key] = tableDefaults['w:pPr'];
+          break;
+        case "w:r":
+          obj[key] = traverseTable(obj[key], inTable, isHeader)
+          if (isHeader)
+            obj[key].unshift(tableDefaults['w:rPr']['header']);
+          break;
+        default:
+          obj[key] = traverseTable(obj[key], inTable, isHeader);
+      }
+    });
+    return obj;
+  }
+  let rowNumber = 0;
+  traverseTable(filteredXml, false, false);
+
+  console.log(JSON.stringify(filteredXml));
   let dataXml = xml(filteredXml);
+  console.log(dataXml)
   dataXml = dataXml.replace(/w:numId w:val="{2-0}"/g, 'w:numId w:val="2"'); // Replace numbering to have correct value
   //a little dirty but until we do better it works
   dataXml = dataXml.replace(/\{_\|link\|_\{(.*?)\|\-\|(.*?)\}_\|link\|_\}/gm, '<w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> HYPERLINK $2 </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr><w:t> $1 </w:t> </w:r><w:r><w:fldChar w:fldCharType="end"/></w:r>')
