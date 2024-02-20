@@ -293,7 +293,6 @@ function html2ooxml(html, style = "") {
 
             row.map((cell) => {
               isHeader = cell.header;
-              console.log(cell.width / widthTotal, (cell.width / widthTotal)*5100);
               tmpCells.push(new docx.TableCell({
                 width: {
                   size: Math.round(cell.width / widthTotal),
@@ -318,8 +317,6 @@ function html2ooxml(html, style = "") {
               type: "pct"
             }
           });
-
-          // console.log(JSON.stringify(cParagraph));
 
           paragraphs.push(cParagraph);
           cParagraph = null;
@@ -383,7 +380,6 @@ function html2ooxml(html, style = "") {
                                                              e["w:trPr"][0]["w:tblHeader"]["_attr"]["w:val"])))
                                  ).some((e) => e);
           rowNumber = (isHeader) ? 0 : rowNumber + 1;
-          console.log(rowNumber, isHeader);
           obj[key] = traverseTable(obj[key], inTable, isHeader);
           break;
         case "w:tcPr":
@@ -408,9 +404,7 @@ function html2ooxml(html, style = "") {
   let rowNumber = 0;
   traverseTable(filteredXml, false, false);
 
-  console.log(JSON.stringify(filteredXml));
   let dataXml = xml(filteredXml);
-  console.log(dataXml)
   dataXml = dataXml.replace(/w:numId w:val="{2-0}"/g, 'w:numId w:val="2"'); // Replace numbering to have correct value
   //a little dirty but until we do better it works
   dataXml = dataXml.replace(/\{_\|link\|_\{(.*?)\|\-\|(.*?)\}_\|link\|_\}/gm, '<w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> HYPERLINK $2 </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr><w:t> $1 </w:t> </w:r><w:r><w:fldChar w:fldCharType="end"/></w:r>')
