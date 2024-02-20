@@ -122,7 +122,7 @@ function html2ooxml(html, style = "") {
         } else if (tag === "h6") {
           cParagraph = new docx.Paragraph({ heading: "Heading6" });
         } else if (tag === "div" || tag === "p") {
-          if (style && typeof style === 'string')
+          if (!("style" in cParagraphProperties) && style && typeof style === 'string')
             cParagraphProperties.style = style
           cParagraph = new docx.Paragraph(cParagraphProperties)
         } else if (tag === "table") {
@@ -196,6 +196,7 @@ function html2ooxml(html, style = "") {
           else if (level >= 0 && list_state[level] === "number")
             cParagraphProperties.numbering = { reference: 2, level: level };
           else cParagraphProperties.bullet = { level: 0 };
+          cParagraphProperties.style = `${list_state[level]}Style`;
         } else if (tag === "code") {
           cRunProperties.style = "CodeChar";
         } else if (tag === "legend" && attribs && attribs.alt !== "undefined") {
