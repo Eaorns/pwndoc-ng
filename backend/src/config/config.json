@@ -4,7 +4,7 @@
         "host": "",
         "database": {
             "name": "pwndoc",
-            "server": "mongo-pwndoc-ng",
+            "server": "mongo-pwndoc-ng-dev",
             "port": "27017"
         },
         "apidoc": true,
