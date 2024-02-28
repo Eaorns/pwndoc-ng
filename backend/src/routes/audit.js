@@ -427,6 +427,35 @@ module.exports = function(app, io) {
         });
     });
 
+    // Generate Validation Report for specific audit
+    app.get("/api/audits/:auditId/generate/validation", acl.hasPermission('audits:read'), function(req, res){
+        // #swagger.tags = ['Audit']
+
+        Audit.getAudit(acl.isAllowed(req.decodedToken.role, 'audits:read-all'), req.params.auditId, req.decodedToken.id)
+        .then(async audit => {
+            var settings = await Settings.getAll();
+
+            if (settings.reviews.enabled && settings.reviews.public.mandatoryReview && audit.state !== 'APPROVED') {
+                Response.Forbidden(res, "Audit was not approved therefore cannot be exported.");
+                return;
+            }
+
+            if (!audit.validationtemplate)
+                throw ({fn: 'BadParameters', message: 'Validation template not defined'})
+
+            var reportDoc = await reportGenerator.generateDoc(audit, true);
+            // var audit_name = audit.name.replace(/[\\\/:*?"<>|]/g, "");
+            var audit_name = `Testrapportage-${('shortName' in audit.company && audit.company.shortName != undefined) ? audit.company.shortName : audit.company.name}-${audit.customFields.find((e) => e.customField.label == 'Projectnummer').text}-v0.1`.replace(/[\\\/:*?"<>|]/g, "");
+            Response.SendFile(res, `${audit_name}.${audit.template.ext || 'docx'}`, reportDoc);
+        })
+        .catch(err => {
+            if (err.code === "ENOENT")
+                Response.BadParameters(res, 'Template File not found')
+            else
+                Response.Internal(res, err)
+        });
+    });
+
     // Update sort options of an audit
     app.put("/api/audits/:auditId/sortfindings", acl.hasPermission('audits:update'), async function(req, res) {
         // #swagger.tags = ['Audit']

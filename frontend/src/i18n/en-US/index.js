@@ -36,6 +36,7 @@ export default {
         usersConnected: 'Users on the Audit:',
         editAudit: 'Edit Audit',
         downloadReport: 'Download Report',
+        downloadValidationReport: 'Download Validation Report',
         deleteAudit: 'Delete Audit',
         topButtonSection: {
             submitReview: 'Mark audit as ready for review',

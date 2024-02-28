@@ -69,6 +69,10 @@ export default {
     return Vue.prototype.$axios.get(`audits/${auditId}/generate`, {responseType: 'blob'})
   },
 
+  generateAuditValidationReport: function(auditId) {
+    return Vue.prototype.$axios.get(`audits/${auditId}/generate/validation`, {responseType: 'blob'})
+  },
+
   updateAuditSortFindings: function(auditId, audit) {
     return Vue.prototype.$axios.put(`audits/${auditId}/sortfindings`, audit)
   },

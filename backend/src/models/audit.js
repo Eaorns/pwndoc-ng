@@ -71,6 +71,7 @@ var AuditSchema = new Schema({
     scope:              [{_id: false, name: String, hosts: [Host]}],
     findings:           [Finding],
     template:           {type: Schema.Types.ObjectId, ref: 'Template'},
+    validationtemplate: {type: Schema.Types.ObjectId, ref: 'Template'},
     creator:            {type: Schema.Types.ObjectId, ref: 'User'},
     sections:           [{field: String, name: String, text: String, customFields: [customField]}], // keep text for retrocompatibility
     customFields:       [customField],
@@ -134,6 +135,7 @@ AuditSchema.statics.getAudit = (isAdmin, auditId, userId) => {
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}, {reviewers: userId}])
         query.populate('template')
+        query.populate('validationtemplate')
         query.populate('creator', 'username firstname lastname email phone role')
         query.populate('company')
         query.populate('client')
@@ -181,6 +183,9 @@ AuditSchema.statics.create = (audit, userId) => {
                 var auditTypeTemplate = row.templates.find(e => e.locale === audit.language)
                 if (auditTypeTemplate)
                     audit.template = auditTypeTemplate.template
+                var auditTypeValidationTemplate = row.validationtemplates.find(e => e.locale === audit.language)
+                if (auditTypeValidationTemplate)
+                    audit.validationtemplate = auditTypeValidationTemplate.template
                 var Section = mongoose.model('CustomSection')
                 var CustomField = mongoose.model('CustomField')
                 var promises = []
@@ -314,7 +319,7 @@ AuditSchema.statics.getGeneral = (isAdmin, auditId, userId) => {
         query.populate('collaborators', 'username firstname lastname')
         query.populate('reviewers', 'username firstname lastname')
         query.populate('company')
-        query.select('name auditType date date_start date_end client collaborators language scope.name template customFields')
+        query.select('name auditType date date_start date_end client collaborators language scope.name template validationtemplate customFields')
         query.lean().exec()
         .then((row) => {
             if (!row)

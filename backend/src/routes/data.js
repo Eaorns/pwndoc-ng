@@ -127,6 +127,7 @@ module.exports = function(app) {
         // Required parameters
         auditType.name = req.body.name;
         auditType.templates = req.body.templates;
+        auditType.validationtemplates = req.body.validationtemplates;
 
         // Optional parameters
         if (req.body.sections) auditType.sections = req.body.sections
@@ -166,7 +167,8 @@ module.exports = function(app) {
 
         var auditTypes = []
         req.body.forEach(e => {
-            auditTypes.push({name: e.name, templates: e.templates, sections: e.sections, hidden: e.hidden})
+            console.log(e);
+            auditTypes.push({name: e.name, templates: e.templates, validationtemplates: e.validationtemplates, sections: e.sections, hidden: e.hidden})
         })
 
         AuditType.updateAll(auditTypes)

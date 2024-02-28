@@ -172,6 +172,23 @@
                                                 {{language.language}} {{$t('template')}} <span class="text-red">*</span>
                                             </template>
                                         </q-select>
+                                        <q-select 
+                                        ref="validate-auditType-template"
+                                        v-model="newAuditType.validationtemplates[idx]" 
+                                        label-slot
+                                        :options="getTemplateOptionsLanguage(language.locale)" 
+                                        option-value="template"
+                                        option-label="name" 
+                                        options-sanitize
+                                        map-options
+                                        outlined
+                                        :rules="[val => !!val || 'Field is required']"
+                                        lazy-rules="ondemand"
+                                        >
+                                            <template v-slot:label>
+                                                {{language.language}} Validation {{$t('template')}} <span class="text-red">*</span>
+                                            </template>
+                                        </q-select>
                                     </div>
                                 </q-item-section>
                             </q-item>
@@ -237,6 +254,18 @@
                                                         readonly
                                                         v-model="auditType.templates[idx].template"
                                                         :label="`${language.language} ${$t('template')}`"
+                                                        :options="templates" 
+                                                        option-value="_id"
+                                                        option-label="name"
+                                                        map-options 
+                                                        options-sanitize
+                                                        outlined
+                                                        />
+                                                        <q-select 
+                                                        v-if="auditType.validationtemplates && auditType.validationtemplates[idx]"
+                                                        readonly
+                                                        v-model="auditType.validationtemplates[idx].template"
+                                                        :label="`${language.language} Validation ${$t('template')}`"
                                                         :options="templates" 
                                                         option-value="_id"
                                                         option-label="name"
@@ -360,6 +389,45 @@
                                                                 >
                                                                     <template v-slot:label>
                                                                         {{language.language}} {{$t('template')}} <span class="text-red">*</span>
+                                                                    </template>
+                                                                </q-select>
+
+                                                                <q-select 
+                                                                ref="validate-validationtemplate-edit"
+                                                                v-if="auditType.validationtemplates[idx]"
+                                                                v-model="auditType.validationtemplates[idx].template" 
+                                                                label-slot
+                                                                :options="getTemplateOptionsLanguage(language.locale)" 
+                                                                option-value="template"
+                                                                option-label="name" 
+                                                                options-sanitize
+                                                                map-options
+                                                                emit-value
+                                                                outlined
+                                                                :rules="[val => !!val || 'Field is required']"
+                                                                lazy-rules="ondemand"
+                                                                >
+                                                                    <template v-slot:label>
+                                                                        {{language.language}} Validation {{$t('template')}} <span class="text-red">*</span>
+                                                                    </template>
+                                                                </q-select>
+                                                                <!-- needed for updating old Audit Types without validationtemplates -->
+                                                                <q-select 
+                                                                v-else
+                                                                ref="validate-validationtemplate-edit2"
+                                                                v-model="auditType.validationtemplates[idx]" 
+                                                                label-slot
+                                                                :options="getTemplateOptionsLanguage(language.locale)" 
+                                                                option-value="template"
+                                                                option-label="name" 
+                                                                options-sanitize
+                                                                map-options
+                                                                outlined
+                                                                :rules="[val => !!val || 'Field is required']"
+                                                                lazy-rules="ondemand"
+                                                                >
+                                                                    <template v-slot:label>
+                                                                        {{language.language}} Validation {{$t('template')}} <span class="text-red">*</span>
                                                                     </template>
                                                                 </q-select>
                                                             </div>

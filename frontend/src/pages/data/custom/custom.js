@@ -16,6 +16,7 @@ export default {
             UserService: UserService,
             Utils: Utils,
             templates: [],
+            validationtemplates: [],
 
             languages: [],
             newLanguage: {locale: "", language: ""},
@@ -23,7 +24,7 @@ export default {
             editLanguage: false,
 
             auditTypes: [],
-            newAuditType: {name: "", templates: [], sections: [], hidden: []},
+            newAuditType: {name: "", templates: [], validationtemplates: [], sections: [], hidden: []},
             editAuditTypes: [],
             editAuditType: false,
 
@@ -224,6 +225,7 @@ export default {
             DataService.getAuditTypes()
             .then((data) => {
                 this.auditTypes = data.data.datas;
+                console.log(this.auditTypes);
             })
             .catch((err) => {
                 console.log(err)
@@ -239,6 +241,7 @@ export default {
             .then((data) => {
                 this.newAuditType.name = "";
                 this.newAuditType.templates = [];
+                this.newAuditType.validationtemplates = [];
                 this.newAuditType.sections = [];
                 this.newAuditType.hidden = [];
                 this.getAuditTypes();

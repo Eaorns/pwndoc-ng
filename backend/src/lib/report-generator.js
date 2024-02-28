@@ -15,11 +15,16 @@ var translate = require('../translate')
 var $t
 
 // Generate document with docxtemplater
-async function generateDoc(audit) {
-    var templatePath = `${__basedir}/../report-templates/${audit.template.name}.${audit.template.ext || 'docx'}`
+async function generateDoc(audit, validationreport=false) {
+    if (validationreport)
+        var templatePath = `${__basedir}/../report-templates/${audit.validationtemplate.name}.${audit.validationtemplate.ext || 'docx'}`
+    else
+        var templatePath = `${__basedir}/../report-templates/${audit.template.name}.${audit.template.ext || 'docx'}`
     var content = fs.readFileSync(templatePath, "binary");
 
     var zip = new PizZip(content);
+
+    console.log(audit.sections[2].customFields[0]);
 
     translate.setLocale(audit.language)
     $t = translate.translate
@@ -331,7 +336,8 @@ expressions.filters.loopObject = function(input) {
 // Lowercases input: {input | lower}
 expressions.filters.lower = function(input) {
     if (!input || input == "undefined") return input;
-        return input.toLowerCase();
+    let val = (typeof input == 'object') ? input.value : input;
+    return val.toLowerCase();
 }
 
 // Creates a clickable "mailto:" link, assumes that input is an email address if
