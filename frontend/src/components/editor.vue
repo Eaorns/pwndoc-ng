@@ -734,7 +734,7 @@ export default {
         } else {
           this.countChange++
         }
-        
+
         if (this.noSync) return;
         this.updateHTML();
       },
@@ -744,8 +744,12 @@ export default {
     this.affixRelativeElement += "-" +  this.ClassEditor;
     //this.editor.setOptions({ editable: this.editable });
     this.editor.setEditable(this.editable && this.initialeDataUpdated);
+    
+    if (typeof this.value === "undefined") {
+      this.value = "";
+    }
+
     if (
-      typeof this.value === "undefined" ||
       this.value === this.editor.getHTML()
     ) {
       return;
@@ -922,6 +926,8 @@ export default {
       return colour;
     },
     updateHTML() {
+      if (!this.initialeDataUpdated) return;
+      
       console.log("updateHTML");
       this.json = this.editor.getJSON();
       this.html = this.editor.getHTML();

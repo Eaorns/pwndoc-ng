@@ -9,34 +9,34 @@
 						<template v-if="$settings.reviews.enabled">
 						<q-item-section side class="topButtonSection" v-if="frontEndAuditState === AUDIT_VIEW_STATE.EDIT">
 							<q-btn class="q-mx-xs q-px-xs" size="11px" unelevated dense color="secondary" :label="$t('btn.topButtonSection.submitReview')" no-caps @click="toggleAskReview" >
-								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.topButtonSection.submitReview')}}</q-tooltip> 
+								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.topButtonSection.submitReview')}}</q-tooltip>
 							</q-btn>
 						</q-item-section>
 						<q-item-section side class="topButtonSection" v-if="[AUDIT_VIEW_STATE.REVIEW_EDITOR, AUDIT_VIEW_STATE.REVIEW_ADMIN, AUDIT_VIEW_STATE.REVIEW_ADMIN_APPROVED].includes(frontEndAuditState)">
 							<q-btn class="q-mx-xs q-px-xs" size="11px" unelevated dense color="amber-9" :label="$t('btn.topButtonSection.cancelReview')" no-caps @click="toggleAskReview" >
-								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.topButtonSection.cancelReview')}}</q-tooltip> 
+								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.topButtonSection.cancelReview')}}</q-tooltip>
 							</q-btn>
 						</q-item-section>
 						<q-item-section side class="topButtonSection" v-if="[AUDIT_VIEW_STATE.REVIEW, AUDIT_VIEW_STATE.REVIEW_ADMIN].includes(frontEndAuditState)">
 							<q-btn class="q-mx-xs q-px-xs" size="11px" unelevated dense color="green" :label="$t('btn.topButtonSection.approve')" no-caps @click="toggleApproval" >
-								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.topButtonSection.approve')}}</q-tooltip> 
+								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.topButtonSection.approve')}}</q-tooltip>
 							</q-btn>
 						</q-item-section>
 						<q-item-section side class="topButtonSection" v-if="[AUDIT_VIEW_STATE.REVIEW_APPROVED, AUDIT_VIEW_STATE.REVIEW_ADMIN_APPROVED, AUDIT_VIEW_STATE.APPROVED_APPROVED].includes(frontEndAuditState)">
 							<q-btn class="q-mx-xs q-px-xs" size="11px" unelevated dense color="warning" :label="$t('btn.topButtonSection.removeApproval')" no-caps @click="toggleApproval" >
-								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.topButtonSection.removeApproval')}}</q-tooltip> 
+								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.topButtonSection.removeApproval')}}</q-tooltip>
 							</q-btn>
 						</q-item-section>
 						</template>
 						<q-item-section side class="topButtonSection">
 							<q-btn flat color="info" @click="generateReport">
-								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.downloadReport')}}</q-tooltip> 
+								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.downloadReport')}}</q-tooltip>
 								<i class="fa fa-download fa-lg"></i>
 							</q-btn>
 						</q-item-section>
 						<q-item-section side class="topButtonSection">
 							<q-btn flat color="primary" @click="generateValidationReport">
-								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.downloadValidationReport')}}</q-tooltip> 
+								<q-tooltip anchor="bottom middle" self="center left" :delay="500" content-class="text-bold">{{$t('tooltip.downloadValidationReport')}}</q-tooltip>
 								<i class="fa fa-download fa-lg"></i>
 							</q-btn>
 						</q-item-section>
@@ -48,7 +48,7 @@
 						</q-item-section>
 						<q-item-section>{{$t('generalInformation')}}</q-item-section>
 					</q-item>
-					
+
 					<div class="row">
 						<div v-for="(user,idx) in generalUsers" :key="idx" class="col multi-colors-bar" :style="{background:user.color}" />
 					</div>
@@ -99,7 +99,7 @@
 								/>
 							</q-item-section>
 						</q-item>
-						
+
 						<div v-for="categoryFindings of findingList" :key="categoryFindings.category">
 							<q-item>
 								<q-item-section>
@@ -111,8 +111,8 @@
 										<q-menu content-style="width: 300px" anchor="bottom middle" self="top left">
 											<q-item>
 												<q-item-section>
-													<q-toggle 
-													v-model="categoryFindings.sortOption.sortAuto" 
+													<q-toggle
+													v-model="categoryFindings.sortOption.sortAuto"
 													:label="$t('automaticSorting')"
 													@input="updateSortFindings"
 													/>
@@ -138,7 +138,7 @@
 											<q-separator />
 											<q-item>
 												<q-item-section>
-													<q-btn 
+													<q-btn
 													flat
 													icon="fa fa-long-arrow-alt-up"
 													:label="$t('ascending')"
@@ -146,14 +146,14 @@
 													no-caps
 													align="left"
 													:disable="!categoryFindings.sortOption.sortAuto"
-													:color="(categoryFindings.sortOption.sortOrder === 'asc')?'green':''" 
-													@click="categoryFindings.sortOption.sortOrder = 'asc'; updateSortFindings()" 
+													:color="(categoryFindings.sortOption.sortOrder === 'asc')?'green':''"
+													@click="categoryFindings.sortOption.sortOrder = 'asc'; updateSortFindings()"
 													/>
 												</q-item-section>
 											</q-item>
 											<q-item>
 												<q-item-section>
-													<q-btn 
+													<q-btn
 													flat
 													icon="fa fa-long-arrow-alt-down"
 													:label="$t('descending')"
@@ -161,8 +161,8 @@
 													no-caps
 													align="left"
 													:disable="!categoryFindings.sortOption.sortAuto"
-													:color="(categoryFindings.sortOption.sortOrder === 'desc')?'green':''" 
-													@click="categoryFindings.sortOption.sortOrder = 'desc'; updateSortFindings()" 
+													:color="(categoryFindings.sortOption.sortOrder === 'desc')?'green':''"
+													@click="categoryFindings.sortOption.sortOrder = 'desc'; updateSortFindings()"
 													/>
 												</q-item-section>
 											</q-item>
@@ -205,6 +205,19 @@
 						</div>
 						<q-separator class="q-my-sm" />
 					</div>
+					<q-list v-for="section of audit.sections" :key="section._id">
+						<q-item :to="'/audits/'+auditId+'/sections/'+section._id">
+							<q-item-section avatar>
+								<q-icon :name="getSectionIcon(section)"></q-icon>
+							</q-item-section>
+							<q-item-section>
+								<span>{{section.name}}</span>
+							</q-item-section>
+						</q-item>
+						<div class="row">
+							<div v-for="(user,idx) in sectionUsers" :key="idx" v-if="user.section === section._id" class="col multi-colors-bar" :style="{background:user.color}" />
+						</div>
+					</q-list>
 				</q-list>
 			</template>
 			<template v-slot:after>
@@ -214,7 +227,7 @@
 						<q-item-section avatar>
 							<q-icon name="fa fa-user"></q-icon>
 						</q-item-section>
-						<q-item-section>{{$t('usersConnected')}}</q-item-section>	
+						<q-item-section>{{$t('usersConnected')}}</q-item-section>
 					</q-item>
 					<q-list dense>
 						<q-item v-for="user of users" :key="user._id">
@@ -229,7 +242,7 @@
 					</q-list>
 				</q-list>
 			</template>
-			
+
 		</q-splitter>
 	</q-drawer>
 	<router-view :key="$route.fullPath" :frontEndAuditState="frontEndAuditState" :parentState="audit.state" :parentApprovals="audit.approvals" />
@@ -275,7 +288,7 @@ export default {
 			this.auditId = this.$route.params.auditId;
 			this.getCustomFields();
 			this.getAuditTypes();
-			this.getAudit(); // Calls getSections				
+			this.getAudit(); // Calls getSections
 		},
 
 		destroyed: function() {
@@ -293,14 +306,14 @@ export default {
 					.map((value, key) => {
 						if (key === 'undefined') key = 'No Category'
 						var sortOption = this.audit.sortFindings.find(option => option.category === key) // Get sort option saved in audit
-						
+
 						if (!sortOption) { // no option for category in audit
 							sortOption = this.vulnCategories.find(e => e.name === key) // Get sort option from default in vulnerability category
 							if (sortOption) // found sort option from vuln categories
 								sortOption.category = sortOption.name
 							else // no default option or category don't exist
 								sortOption = {category: key, sortValue: 'cvssScore', sortOrder: 'desc', sortAuto: true} // set a default sort option
-							
+
 							this.audit.sortFindings.push({
 								category: sortOption.category,
 								sortValue: sortOption.sortValue,
@@ -308,7 +321,7 @@ export default {
 								sortAuto: sortOption.sortAuto
 							})
 						}
-						
+
 						return {category: key, findings: value, sortOption: sortOption}
 					})
 					.value()
@@ -342,7 +355,7 @@ export default {
 					return cvssColors[severityColorName] || cvssColors.noneColor;
 				} else {
 					switch(severity) {
-						case "Low": 
+						case "Low":
 							return "green";
 						case "Medium":
 							return "orange";
@@ -391,7 +404,7 @@ export default {
 					return {menu: 'editFinding', finding: this.$router.currentRoute.params.findingId, room: this.auditId}
 				else if (this.$router.currentRoute.name && this.$router.currentRoute.name === 'editSection' && this.$router.currentRoute.params.sectionId)
 					return {menu: 'editSection', section: this.$router.currentRoute.params.sectionId, room: this.auditId}
-				
+
 				return {menu: 'undefined', room: this.auditId}
 			},
 
@@ -445,7 +458,7 @@ export default {
 			getUIState: function() {
 				if(!this.$settings.reviews.enabled || this.audit.state === "EDIT") {
 					this.frontEndAuditState = this.isUserAnEditor() ? Utils.AUDIT_VIEW_STATE.EDIT : Utils.AUDIT_VIEW_STATE.EDIT_READONLY;
-				} 
+				}
 				else if (this.audit.state === "REVIEW") {
 					if (!this.isUserAReviewer()) {
 						this.frontEndAuditState = this.isUserAnEditor()? Utils.AUDIT_VIEW_STATE.REVIEW_EDITOR : Utils.AUDIT_VIEW_STATE.REVIEW_READONLY;
@@ -456,7 +469,7 @@ export default {
 						return;
 					}
 					this.frontEndAuditState = this.userHasAlreadyApproved() ? Utils.AUDIT_VIEW_STATE.REVIEW_APPROVED : Utils.AUDIT_VIEW_STATE.REVIEW;
-				} 
+				}
 				else if (this.audit.state === "APPROVED") {
 					if (!this.isUserAReviewer()) {
 						this.frontEndAuditState = Utils.AUDIT_VIEW_STATE.APPROVED_READONLY;
@@ -560,7 +573,7 @@ export default {
 					document.body.appendChild(link);
 					link.click();
 					link.remove();
-					
+
 					downloadNotif({
 						icon: 'done',
 						spinner: false,
@@ -606,7 +619,7 @@ export default {
 					document.body.appendChild(link);
 					link.click();
 					link.remove();
-					
+
 					downloadNotif({
 						icon: 'done',
 						spinner: false,
@@ -650,8 +663,8 @@ export default {
 				var allowedFieldTypes = ['date', 'input', 'radio', 'select']
 				this.customFields.forEach(e => {
 					if (
-						(e.display === 'finding' || e.display === 'vulnerability') && 
-						(!e.displaySub || e.displaySub === category) && 
+						(e.display === 'finding' || e.display === 'vulnerability') &&
+						(!e.displaySub || e.displaySub === category) &&
 						allowedFieldTypes.includes(e.fieldType)
 					) {
 						options.push({label: e.label, value: e.label})
@@ -698,7 +711,7 @@ export default {
 						position: 'top-right'
 					})
 				})
-				.catch((err) => {     
+				.catch((err) => {
 					console.log(err)
 					Notify.create({
 						message: err.response.data.datas || err.message,
@@ -719,7 +732,7 @@ export default {
 						position: 'top-right'
 					})
 				})
-				.catch((err) => {          
+				.catch((err) => {
 					console.log(err)
 					Notify.create({
 						message: err.response.data.datas || err.message,
