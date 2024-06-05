@@ -89,7 +89,7 @@
             </template>
 
             <template v-slot:body="props">
-                <q-tr :props="props" :class="(props.row.status === 1)?'bg-light-blue-2':(props.row.status === 2)?'bg-orange-2':props.row">
+                <q-tr :props="props" :class="(props.row.status === 1)?'bg-light-blue-2':(props.row.status === 2)?'bg-orange-2':''">
                     <q-td key="title" :props="props">
                         {{props.row.detail.title}}
                         <q-btn dense round flat :icon="props.expand ? 'arrow_drop_up' : 'arrow_drop_down'" @click="props.expand = !props.expand" />

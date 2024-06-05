@@ -45,7 +45,7 @@ export default {
             filteredRowsCount: 0,
             // Search filter
             search: {title: '', vulnType: '', category: ''},
-            
+
             // Vulnerabilities languages
             languages: [],
             dtLanguage: "",
@@ -128,7 +128,7 @@ export default {
             if (index < 0)
                 return $t('err.notDefinedLanguage');
             else
-                return row.details[index].title;         
+                return row.details[index].title;
         },
 
         customFilter: function(rows, terms, cols, getCellValue) {
@@ -139,7 +139,7 @@ export default {
                 var termTitle = (terms.title || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                 var termCategory = (terms.category || "").toLowerCase()
                 var termVulnType = (terms.vulnType || "").toLowerCase()
-                return title.indexOf(termTitle) > -1 && 
+                return title.indexOf(termTitle) > -1 &&
                 type.indexOf(termVulnType) > -1 &&
                 category.indexOf(termCategory) > -1
             })
@@ -162,7 +162,9 @@ export default {
                     references: vuln.detail.references,
                     cvssv3: vuln.cvssv3,
                     category: vuln.category,
-                    customFields: Utils.filterCustomFields('finding', vuln.category, this.$parent.customFields, vuln.detail.customFields, this.$parent.audit.language)
+                    customFields: Utils.filterCustomFields('finding', vuln.category, this.$parent.customFields, vuln.detail.customFields, this.$parent.audit.language),
+                    parentId: vuln._id,
+                    parentStatus: vuln.status
                 };
             }
 

@@ -181,6 +181,13 @@
 											<q-item-section side v-if="!categoryFindings.sortOption.sortAuto && frontEndAuditState === AUDIT_VIEW_STATE.EDIT">
 												<q-icon name="mdi-arrow-split-horizontal" class="cursor-pointer handle" color="grey" />
 											</q-item-section>
+											<q-item-section side style="padding-right: 5px; width: 20px;">
+												<i v-if="finding.parentId != null"
+													:style="(finding.parentStatus > 0)?((finding.parentStatus === 1)?'color: var(--q-color-info)':(finding.parentStatus === 2)?'color: var(--q-color-warning)':''):'visibility: hidden'"
+													class="fa fa-exclamation-triangle"
+													aria-hidden="true"></i>
+												<i v-else class="fa fa-map-marker" aria-hidden="true"></i>
+											</q-item-section>
 											<q-item-section side>
 												<q-chip
 													class="text-white"

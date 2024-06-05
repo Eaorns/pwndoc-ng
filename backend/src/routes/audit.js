@@ -18,9 +18,9 @@ module.exports = function(app, io) {
             return utils.getSockets(io, room).map(s => s.username)
         }
         var filters = {};
-        if (req.query.findingTitle) 
+        if (req.query.findingTitle)
             filters['findings.title'] = new RegExp(utils.escapeRegex(req.query.findingTitle), 'i')
-            
+
         Audit.getAudits(acl.isAllowed(req.decodedToken.role, 'audits:read-all'), req.decodedToken.id, filters)
         .then(msg => {
                 var result = []
@@ -47,7 +47,7 @@ module.exports = function(app, io) {
     });
 
 
-    
+
     // Get clients for export
     /*
     app.get("/api/audits/export", acl.hasPermission('audits:read-all'), function(req, res) {
@@ -118,7 +118,7 @@ module.exports = function(app, io) {
         // #swagger.tags = ['Audit']
 
         var update = {};
-        
+
         var settings = await Settings.getAll();
         var audit = await Audit.getAudit(acl.isAllowed(req.decodedToken.role, 'audits:read-all'), req.params.auditId, req.decodedToken.id);
         if (settings.reviews.enabled && audit.state !== "EDIT") {
@@ -132,13 +132,13 @@ module.exports = function(app, io) {
                 return;
             }
 
-            // Is the new reviewer the creator of the audit? 
+            // Is the new reviewer the creator of the audit?
             if (req.body.reviewers.some(element => element._id === audit.creator._id)) {
                 Response.BadParameters(res, "A user cannot simultaneously be a reviewer and a collaborator/creator");
                 return;
             }
 
-            // Is the new reviewer one of the new collaborators that will override current collaborators? 
+            // Is the new reviewer one of the new collaborators that will override current collaborators?
             if (req.body.collaborators) {
                 req.body.reviewers.forEach((reviewer) => {
                     if (req.body.collaborators.some(element => !element._id || element._id === reviewer._id)) {
@@ -148,7 +148,7 @@ module.exports = function(app, io) {
                 });
             }
 
-            // If no new collaborators are being set, is the new reviewer one of the current collaborators? 
+            // If no new collaborators are being set, is the new reviewer one of the current collaborators?
             else if (audit.collaborators) {
                 req.body.reviewers.forEach((reviewer) => {
                     if (audit.collaborators.some(element => element._id === reviewer._id)) {
@@ -164,7 +164,7 @@ module.exports = function(app, io) {
                 Response.BadParameters(res, "One or more collaborator is missing an _id");
                 return;
             }
-            
+
             // Are the new collaborators part of the current reviewers?
             req.body.collaborators.forEach((collaborator) => {
                 if (audit.reviewers.some(element => element._id === collaborator._id)) {
@@ -262,7 +262,7 @@ module.exports = function(app, io) {
         var finding = {};
         // Required parameters
         finding.title = req.body.title;
-        
+
         // Optional parameters
         if (req.body.vulnType) finding.vulnType = req.body.vulnType;
         if (req.body.description) finding.description = req.body.description;
@@ -277,6 +277,9 @@ module.exports = function(app, io) {
         if (req.body.status !== undefined) finding.status = req.body.status;
         if (req.body.category) finding.category = req.body.category
         if (req.body.customFields) finding.customFields = req.body.customFields
+        if (req.body.parentId) finding.parentId = req.body.parentId
+        if (req.body.parentStatus) finding.parentStatus = req.body.parentStatus
+
 
         if (settings.reviews.enabled && settings.reviews.private.removeApprovalsUponUpdate) {
             Audit.updateGeneral(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, { approvals: [] });
@@ -309,7 +312,7 @@ module.exports = function(app, io) {
             Response.Forbidden(res, "The audit is not in the EDIT state and therefore cannot be edited.");
             return;
         }
-        
+
         var finding = {};
         // Optional parameters
         if (req.body.title) finding.title = req.body.title;
@@ -333,7 +336,7 @@ module.exports = function(app, io) {
 
         Audit.updateFinding(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, req.params.findingId, finding)
         .then(msg => {
-            io.to(req.params.auditId).emit('updateAudit');            
+            io.to(req.params.auditId).emit('updateAudit');
             Response.Ok(res, msg)
         })
         .catch(err => Response.Internal(res, err))
@@ -351,7 +354,7 @@ module.exports = function(app, io) {
         }
         Audit.deleteFinding(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, req.params.findingId)
         .then(msg => {
-            io.to(req.params.auditId).emit('updateAudit');            
+            io.to(req.params.auditId).emit('updateAudit');
             Response.Ok(res, msg);
         })
         .catch(err => Response.Internal(res, err))
@@ -385,7 +388,7 @@ module.exports = function(app, io) {
         section.customFields = req.body.customFields;
 
         // For retrocompatibility with old section.text usage
-        if (req.body.text) section.text = req.body.text; 
+        if (req.body.text) section.text = req.body.text;
 
         if (settings.reviews.enabled && settings.reviews.private.removeApprovalsUponUpdate) {
             Audit.updateGeneral(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, { approvals: [] });
@@ -470,7 +473,7 @@ module.exports = function(app, io) {
         // Optional parameters
         if (req.body.sortFindings) update.sortFindings = req.body.sortFindings;
         if (settings.reviews.enabled && settings.reviews.private.removeApprovalsUponUpdate) update.approvals = [];
-        
+
         Audit.updateSortFindings(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, update)
         .then(msg => {
             io.to(req.params.auditId).emit('updateAudit');
@@ -493,7 +496,7 @@ module.exports = function(app, io) {
             Response.BadParameters(res, 'Missing some required parameters: oldIndex, newIndex');
             return;
         }
-        
+
         var move = {};
         // Required parameters
         move.oldIndex = req.body.oldIndex;
@@ -502,7 +505,7 @@ module.exports = function(app, io) {
         if (settings.reviews.enabled && settings.reviews.private.removeApprovalsUponUpdate) {
             Audit.updateGeneral(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, { approvals: [] });
         }
-        
+
         Audit.moveFindingPosition(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, move)
         .then(msg => {
             io.to(req.params.auditId).emit('updateAudit');

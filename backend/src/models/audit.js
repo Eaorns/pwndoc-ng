@@ -30,7 +30,9 @@ var Finding = {
     scope:                  String,
     status:                 {type: Number, enum: [0,1], default: 1}, // 0: done, 1: redacting
     category:               String,
-    customFields:           [customField]
+    customFields:           [customField],
+    parentId:               Schema.Types.ObjectId,
+    parentStatus:           Number
 }
 
 var Service = {
@@ -86,7 +88,7 @@ var AuditSchema = new Schema({
 
 // Get all audits (admin)
 AuditSchema.statics.getAudits = (isAdmin, userId, filters) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.find(filters)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}, {reviewers: userId}])
@@ -215,7 +217,7 @@ AuditSchema.statics.create = (audit, userId) => {
                                 fieldText = fieldText.value
                             else
                                 fieldText = ""
-                            
+
                             delete field.text
                             tmpSection.customFields.push({customField: field, text: fieldText})
                         }
@@ -271,9 +273,9 @@ AuditSchema.statics.create = (audit, userId) => {
 // Delete Outdated audit (Automation setting feature)
 AuditSchema.statics.deleteOutdatedReportAutomation = (days) => {
     return new Promise((resolve, reject) => {
-        var deleteBefore = new Date(Date.now() -  86400000 * days); // 86400000 = 1 day | test 64000 = 1 min 
+        var deleteBefore = new Date(Date.now() -  86400000 * days); // 86400000 = 1 day | test 64000 = 1 min
         var query = Audit.deleteMany({createdAt:{"$lte": deleteBefore}})
-        query.exec()               
+        query.exec()
         .then((data) => {
             resolve(data)
         })
@@ -289,11 +291,11 @@ AuditSchema.statics.delete = (isAdmin, auditId, userId) => {
         var query = Audit.findOneAndRemove({_id: auditId})
         if (!isAdmin)
             query.or([{creator: userId}])
-        return query.exec()               
+        return query.exec()
         .then((row) => {
             if (!row)
                 throw({fn: 'NotFound', message: 'Audit not found or Insufficient Privileges'})
-            
+
             resolve(row)
         })
         .catch((err) => {
@@ -304,15 +306,15 @@ AuditSchema.statics.delete = (isAdmin, auditId, userId) => {
 
 // Get audit general information
 AuditSchema.statics.getGeneral = (isAdmin, auditId, userId) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findById(auditId);
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}, {reviewers: userId}])
         query.populate({
-            path: 'client', 
-            select: 'email firstname lastname', 
+            path: 'client',
+            select: 'email firstname lastname',
             populate: {
-                path: 'company', 
+                path: 'company',
                 select: 'name'}
             });
         query.populate('creator', 'username firstname lastname')
@@ -339,7 +341,7 @@ AuditSchema.statics.getGeneral = (isAdmin, auditId, userId) => {
 
 // Update audit general information
 AuditSchema.statics.updateGeneral = (isAdmin, auditId, userId, update) => {
-    return new Promise(async(resolve, reject) => { 
+    return new Promise(async(resolve, reject) => {
         if (update.company && update.company.name) {
             var Company = mongoose.model("Company");
             try {
@@ -356,7 +358,7 @@ AuditSchema.statics.updateGeneral = (isAdmin, auditId, userId, update) => {
         .then(row => {
             if (!row)
                 throw({fn: 'NotFound', message: 'Audit not found or Insufficient Privileges'})
-            
+
             resolve("Audit General updated successfully")
         })
         .catch((err) => {
@@ -367,7 +369,7 @@ AuditSchema.statics.updateGeneral = (isAdmin, auditId, userId, update) => {
 
 // Get audit Network information
 AuditSchema.statics.getNetwork = (isAdmin, auditId, userId) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findById(auditId)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}, {reviewers: userId}])
@@ -376,7 +378,7 @@ AuditSchema.statics.getNetwork = (isAdmin, auditId, userId) => {
         .then((row) => {
             if (!row)
                 throw({fn: 'NotFound', message: 'Audit not found or Insufficient Privileges'})
-            
+
             resolve(row)
         })
         .catch((err) => {
@@ -387,7 +389,7 @@ AuditSchema.statics.getNetwork = (isAdmin, auditId, userId) => {
 
 // Update audit Network information
 AuditSchema.statics.updateNetwork = (isAdmin, auditId, userId, scope) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findByIdAndUpdate(auditId, scope)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}])
@@ -406,11 +408,11 @@ AuditSchema.statics.updateNetwork = (isAdmin, auditId, userId, scope) => {
 
 // Create finding
 AuditSchema.statics.createFinding = (isAdmin, auditId, userId, finding) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         Audit.getLastFindingIdentifier(auditId)
         .then(identifier => {
             finding.identifier = ++identifier
-            
+
             var query = Audit.findByIdAndUpdate(auditId, {$push: {findings: finding}})
             if (!isAdmin)
                 query.or([{creator: userId}, {collaborators: userId}])
@@ -458,7 +460,7 @@ AuditSchema.statics.getLastFindingIdentifier = (auditId) => {
 
 // Get finding of audit
 AuditSchema.statics.getFinding = (isAdmin, auditId, userId, findingId) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findById(auditId)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}, {reviewers: userId}])
@@ -469,9 +471,9 @@ AuditSchema.statics.getFinding = (isAdmin, auditId, userId, findingId) => {
                 throw({fn: 'NotFound', message: 'Audit not found or Insufficient Privileges'})
 
             var finding = row.findings.id(findingId)
-            if (finding === null) 
+            if (finding === null)
                 throw({fn: 'NotFound', message: 'Finding not found'})
-            else 
+            else
                 resolve(finding)
         })
         .catch((err) => {
@@ -482,7 +484,7 @@ AuditSchema.statics.getFinding = (isAdmin, auditId, userId, findingId) => {
 
 // Update finding of audit
 AuditSchema.statics.updateFinding = (isAdmin, auditId, userId, findingId, newFinding) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var sortAuto = true
 
         var query = Audit.findById(auditId)
@@ -495,7 +497,7 @@ AuditSchema.statics.updateFinding = (isAdmin, auditId, userId, findingId, newFin
 
             var finding = row.findings.id(findingId)
             if (finding === null)
-                reject({fn: 'NotFound', message: 'Finding not found'})         
+                reject({fn: 'NotFound', message: 'Finding not found'})
             else {
                 var sortOption = row.sortFindings.find(e => e.category === (newFinding.category || 'No Category'))
                 if (sortOption && !sortOption.sortAuto)
@@ -505,7 +507,7 @@ AuditSchema.statics.updateFinding = (isAdmin, auditId, userId, findingId, newFin
                     finding[key] = newFinding[key]
                 })
                 return row.save({ validateBeforeSave: false }) // Disable schema validation since scope changed from Array to String
-            } 
+            }
         })
         .then(() => {
             if (sortAuto)
@@ -514,7 +516,7 @@ AuditSchema.statics.updateFinding = (isAdmin, auditId, userId, findingId, newFin
                 resolve("Audit Finding updated successfully")
         })
         .then(() => {
-            resolve("Audit Finding updated successfully")        
+            resolve("Audit Finding updated successfully")
         })
         .catch((err) => {
             reject(err)
@@ -524,7 +526,7 @@ AuditSchema.statics.updateFinding = (isAdmin, auditId, userId, findingId, newFin
 
 // Delete finding of audit
 AuditSchema.statics.deleteFinding = (isAdmin, auditId, userId, findingId) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findById(auditId)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}])
@@ -552,7 +554,7 @@ AuditSchema.statics.deleteFinding = (isAdmin, auditId, userId, findingId) => {
 
 // Create section
 AuditSchema.statics.createSection = (isAdmin, auditId, userId, section) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findOneAndUpdate({_id: auditId, 'sections.field': {$ne: section.field}}, {$push: {sections: section}})
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}])
@@ -560,7 +562,7 @@ AuditSchema.statics.createSection = (isAdmin, auditId, userId, section) => {
         .then((row) => {
             if (!row)
                 throw({fn: 'NotFound', message: 'Audit not found or Section already exists or Insufficient Privileges'})
-            
+
             resolve('Audit Section created successfully')
         })
         .catch((err) => {
@@ -571,7 +573,7 @@ AuditSchema.statics.createSection = (isAdmin, auditId, userId, section) => {
 
 // Get section of audit
 AuditSchema.statics.getSection = (isAdmin, auditId, userId, sectionId) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findById(auditId)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}, {reviewers: userId}])
@@ -583,9 +585,9 @@ AuditSchema.statics.getSection = (isAdmin, auditId, userId, sectionId) => {
             throw({fn: 'NotFound', message: 'Audit not found or Insufficient Privileges'})
 
             var section = row.sections.id(sectionId);
-            if (section === null) 
+            if (section === null)
                 throw({fn: 'NotFound', message: 'Section id not found'});
-            else 
+            else
                 resolve(section);
         })
         .catch((err) => {
@@ -596,7 +598,7 @@ AuditSchema.statics.getSection = (isAdmin, auditId, userId, sectionId) => {
 
 // Update section of audit
 AuditSchema.statics.updateSection = (isAdmin, auditId, userId, sectionId, newSection) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findById(auditId)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}])
@@ -604,19 +606,19 @@ AuditSchema.statics.updateSection = (isAdmin, auditId, userId, sectionId, newSec
         .then((row) => {
             if (!row)
                 throw({fn: 'NotFound', message: 'Audit not found or Insufficient Privileges'})
-            
+
             var section = row.sections.id(sectionId)
             if (section === null)
-                throw({fn: 'NotFound', message: 'Section not found'})          
+                throw({fn: 'NotFound', message: 'Section not found'})
             else {
                 Object.keys(newSection).forEach((key) => {
                     section[key] = newSection[key]
                 })
                 return row.save()
-            } 
+            }
         })
         .then(() => {
-            resolve('Audit Section updated successfully')        
+            resolve('Audit Section updated successfully')
         })
         .catch((err) => {
             reject(err)
@@ -626,7 +628,7 @@ AuditSchema.statics.updateSection = (isAdmin, auditId, userId, sectionId, newSec
 
 // Delete section of audit
 AuditSchema.statics.deleteSection = (isAdmin, auditId, userId, sectionId) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findById(auditId)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}])
@@ -655,7 +657,7 @@ AuditSchema.statics.deleteSection = (isAdmin, auditId, userId, sectionId) => {
 // Update audit sort options for findings and run the sorting. If update param is null then just run sorting
 AuditSchema.statics.updateSortFindings = (isAdmin, auditId, userId, update) => {
     return new Promise((resolve, reject) => {
-        var audit = {} 
+        var audit = {}
         var query = Audit.findById(auditId)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}])
@@ -670,8 +672,8 @@ AuditSchema.statics.updateSortFindings = (isAdmin, auditId, userId, update) => {
 
                 var VulnerabilityCategory = mongoose.model('VulnerabilityCategory')
                 return VulnerabilityCategory.getAll()
-                
-            }            
+
+            }
         })
         .then(row => {
             var _ = require('lodash')
@@ -710,7 +712,7 @@ AuditSchema.statics.updateSortFindings = (isAdmin, auditId, userId, update) => {
                     // Get built-in value (findings[sortValue])
                     var left = a[group.sortOption.sortValue]
 
-                    // If sort value is a CVSS Score calculate it 
+                    // If sort value is a CVSS Score calculate it
                     if (cvssA.success && group.sortOption.sortValue === 'cvssScore')
                         left = cvssA.baseMetricScore
                     else if (cvssA.success && group.sortOption.sortValue === 'cvssTemporalScore')
@@ -729,7 +731,7 @@ AuditSchema.statics.updateSortFindings = (isAdmin, auditId, userId, update) => {
                         left = 0
                     // Convert to string in case of int value
                     left = left.toString()
-                    
+
                     // Same for right value to compare
                     var right = b[group.sortOption.sortValue]
 
@@ -770,7 +772,7 @@ AuditSchema.statics.updateSortFindings = (isAdmin, auditId, userId, update) => {
 
 // Move finding from move.oldIndex to move.newIndex
 AuditSchema.statics.moveFindingPosition = (isAdmin, auditId, userId, move) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         var query = Audit.findById(auditId)
         if (!isAdmin)
             query.or([{creator: userId}, {collaborators: userId}])
@@ -778,7 +780,7 @@ AuditSchema.statics.moveFindingPosition = (isAdmin, auditId, userId, move) => {
         .then((row) => {
             if (!row)
                 throw({fn: 'NotFound', message: 'Audit not found or Insufficient Privileges'})
-            
+
             var tmp = row.findings[move.oldIndex]
             row.findings.splice(move.oldIndex, 1)
             row.findings.splice(move.newIndex, 0, tmp)
@@ -787,7 +789,7 @@ AuditSchema.statics.moveFindingPosition = (isAdmin, auditId, userId, move) => {
             return row.save()
         })
         .then((msg) => {
-            resolve('Audit Finding moved successfully') 
+            resolve('Audit Finding moved successfully')
         })
         .catch((err) => {
             reject(err)
@@ -805,17 +807,17 @@ AuditSchema.statics.updateApprovals = (isAdmin, auditId, userId, update) => {
         } else {
             update.state = "REVIEW";
         }
-        
+
         var query = Audit.findByIdAndUpdate(auditId, update)
         query.nor([{creator: userId}, {collaborators: userId}]);
         if (!isAdmin)
             query.or([{reviewers: userId}]);
-        
+
         query.exec()
         .then(row => {
             if (!row)
                 throw({fn: 'NotFound', message: 'Audit not found or Insufficient Privileges'});
-            
+
             resolve("Audit approvals updated successfully");
         })
         .catch((err) => {
