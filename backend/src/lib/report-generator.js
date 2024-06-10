@@ -29,6 +29,11 @@ async function generateDoc(audit, validationreport=false) {
     translate.setLocale(audit.language)
     $t = translate.translate
 
+    // set the identifier of each vulnerability to the index of the array
+    audit.findings.forEach((finding, index) => {
+        finding.identifier = index + 1
+    })
+
     var settings = await Settings.getAll();
     var preppedAudit = await prepAuditData(audit, settings)
 
@@ -962,7 +967,8 @@ async function prepAuditData(data, settings) {
         }
         if (section.text) // keep text for retrocompatibility
             formatSection.text = await splitHTMLParagraphs(section.text)
-        else if (section.customFields) {
+        // If only because section has "any" inside its text attribute and then skip the section.customFields
+        if (section.customFields) {
             for (field of section.customFields) {
                 var fieldType = field.customField.fieldType
                 var label = field.customField.label
