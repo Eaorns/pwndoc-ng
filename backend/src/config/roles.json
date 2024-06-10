@@ -4,5 +4,12 @@
         "allows": [
             "audits:read-all"
         ]
-    }
+    },
+    "reviewer": {
+        "inherits": ["user"],
+        "allows": [
+          "audits:review-all",
+          "audits:read-all"
+        ]
+      }
 }
