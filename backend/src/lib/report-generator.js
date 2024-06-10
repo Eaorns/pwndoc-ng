@@ -323,8 +323,9 @@ expressions.filters.lines = function(input) {
 
 // Creates a hyperlink: {@input | linkTo: 'https://example.com' | p}
 expressions.filters.linkTo = function(input, url) {
-    var encodedUrl = encodeURIComponent(url); // fix breaking word with special characters in reference
-    var encodedInput = encodeURIComponent(input); // fix breaking word with special characters in reference
+    // fix fix: now, urls were generated being quadruple URL encoded for some reason
+    var encodedUrl = url; // encodeURIComponent(url); // fix breaking word with special characters in reference
+    var encodedInput = input; // encodeURIComponent(input); // fix breaking word with special characters in reference
     return `<w:r><w:fldChar w:fldCharType="begin"/></w:r>
         <w:r><w:instrText xml:space="preserve"> HYPERLINK "${encodedUrl}" </w:instrText></w:r>
         <w:r><w:fldChar w:fldCharType="separate"/></w:r>
@@ -431,13 +432,13 @@ expressions.filters.sortASC = function(input=null, key = null) {
 expressions.filters.sortArrayByField = function (input, field, order) {
     //invalid order sort ascending
     if(order != 1 && order != -1) order = 1;
-    
+
     const sorted = input.sort((a,b) => {
         //multiply by order so that if is descending (-1) will reverse the values
         return _.get(a, field).toString().localeCompare(_.get(b, field).toString(), undefined, {numeric: true}) * order
-    })    
+    })
     return sorted;
-} 
+}
 
 
 // Takes a string as input and split it into an ordered list using a separator: {input | split: ', '}
@@ -498,7 +499,7 @@ expressions.filters.count = function(input, severity, scoreType) {
             break;
         case "environmental":
         default:  // Set default to environmental score
-            scoreAttribute = "environmentalSeverity";            
+            scoreAttribute = "environmentalSeverity";
     }
     for(var i = 0; i < input.length; i++){
 
@@ -753,10 +754,10 @@ async function prepAuditData(data, settings) {
     var cellCriticalColor = '<w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="'+criticalColor+'"/></w:tcPr>';
 
     /** Remediation complexity  Colors for table cells */
-    
-    var lowColorRemediationComplexity = settings.report.public.remediationColorsComplexity.lowColor.replace('#', ''); 
+
+    var lowColorRemediationComplexity = settings.report.public.remediationColorsComplexity.lowColor.replace('#', '');
     var mediumColorRemediationComplexity = settings.report.public.remediationColorsComplexity.mediumColor.replace('#', '');
-    var highColorRemediationComplexity = settings.report.public.remediationColorsComplexity.highColor.replace('#', ''); 
+    var highColorRemediationComplexity = settings.report.public.remediationColorsComplexity.highColor.replace('#', '');
 
     var cellLowColorRemediationComplexity = '<w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="'+lowColorRemediationComplexity+'"/></w:tcPr>';
     var cellMediumColorRemediationComplexity = '<w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="'+mediumColorRemediationComplexity+'"/></w:tcPr>';
@@ -765,10 +766,10 @@ async function prepAuditData(data, settings) {
 
     /** Remediation priority Colors for table cells */
 
-    var lowColorRemediationPriority = settings.report.public.remediationColorsPriority.lowColor.replace('#', ''); 
-    var mediumColorRemediationPriority = settings.report.public.remediationColorsPriority.mediumColor.replace('#', ''); 
-    var highColorRemediationPriority = settings.report.public.remediationColorsPriority.highColor.replace('#', ''); 
-    var urgentColorRemediationPriority = settings.report.public.remediationColorsPriority.urgentColor.replace('#', ''); 
+    var lowColorRemediationPriority = settings.report.public.remediationColorsPriority.lowColor.replace('#', '');
+    var mediumColorRemediationPriority = settings.report.public.remediationColorsPriority.mediumColor.replace('#', '');
+    var highColorRemediationPriority = settings.report.public.remediationColorsPriority.highColor.replace('#', '');
+    var urgentColorRemediationPriority = settings.report.public.remediationColorsPriority.urgentColor.replace('#', '');
 
     var cellLowColorRemediationPriority = '<w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="'+lowColorRemediationPriority+'"/></w:tcPr>';
     var cellMediumColorRemediationPriority = '<w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="'+mediumColorRemediationPriority+'"/></w:tcPr>';
@@ -863,13 +864,13 @@ async function prepAuditData(data, settings) {
             category: $t(finding.category) || $t("No Category"),
             identifier: "IDX-" + utils.lPad(finding.identifier)
         }
-        // Remediation Complexity color 
+        // Remediation Complexity color
         if (tmpFinding.remediationComplexity === 1) tmpFinding.remediation.cellColorComplexity = cellLowColorRemediationComplexity
         else if (tmpFinding.remediationComplexity === 2) tmpFinding.remediation.cellColorComplexity = cellMediumColorRemediationComplexity
         else if (tmpFinding.remediationComplexity === 3) tmpFinding.remediation.cellColorComplexity = cellHighColorRemediationComplexity
         else tmpFinding.remediation.cellColorComplexity = cellNoneColor
 
-        // Remediation Priority color 
+        // Remediation Priority color
         if (tmpFinding.priority === 1) tmpFinding.remediation.cellColorPriority = cellLowColorRemediationPriority
         else if (tmpFinding.priority === 2) tmpFinding.remediation.cellColorPriority = cellMediumColorRemediationPriority
         else if (tmpFinding.priority === 3) tmpFinding.remediation.cellColorPriority = cellHighColorRemediationPriority
