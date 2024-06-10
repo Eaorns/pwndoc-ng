@@ -1,9 +1,10 @@
 var expressions = require('angular-expressions');
 var translate = require('../translate')
 var html2ooxml = require('./html2ooxml');
+const { escapeXMLEntities } = require('./utils');
 
-var numbers = {'nl': ['nul', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 
-                      'acht', 'negen', 'tien', 'elf', 'twaalf', 'dertien', 'veertien', 
+var numbers = {'nl': ['nul', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven',
+                      'acht', 'negen', 'tien', 'elf', 'twaalf', 'dertien', 'veertien',
                       'vijftien', 'zestien', 'zeventien', 'achtien', 'negentien', 'twintig']};
 
 // Apply all customs functions
@@ -58,40 +59,40 @@ expressions.filters.extractTargets = function(input) {
     return out;
 }
 
-expressions.filters.generateTargetsTable = function(input) {    
+expressions.filters.generateTargetsTable = function(input) {
     // source: https://gist.github.com/aminnj/5ca372aa2def72fb017b531c894afdca
     char_weights = {
-        " ": 4.4453125,  "!": 4.4453125,  '"': 5.6796875, 
-        "#": 8.8984375,  "$": 8.8984375,  "%": 14.2265625, 
-        "&": 10.671875,  "'": 3.0546875,  "(": 5.328125, 
-        ")": 5.328125,   "*": 6.2265625,  "+": 9.34375, 
-        ",": 4.4453125,  "-": 5.328125,   ".": 4.4453125, 
-        "/": 4.4453125,  "0": 8.8984375,  "1": 7.7228125, 
-        "2": 8.8984375,  "3": 8.8984375,  "4": 8.8984375, 
-        "5": 8.8984375,  "6": 8.8984375,  "7": 8.8984375, 
-        "8": 8.8984375,  "9": 8.8984375,  ":": 4.4453125, 
-        ";": 4.4453125,  "<": 9.34375,    "=": 9.34375, 
-        ">": 9.34375,    "?": 8.8984375,  "@": 16.2421875, 
-        "A": 10.671875,  "B": 10.671875,  "C": 11.5546875, 
-        "D": 11.5546875, "E": 10.671875,  "F": 9.7734375, 
-        "G": 12.4453125, "H": 11.5546875, "I": 4.4453125, 
-        "J": 8,          "K": 10.671875,  "L": 8.8984375, 
-        "M": 13.328125,  "N": 11.5546875, "O": 12.4453125, 
-        "P": 10.671875,  "Q": 12.4453125, "R": 11.5546875, 
-        "S": 10.671875,  "T": 9.7734375,  "U": 11.5546875, 
-        "V": 10.671875,  "W": 15.1015625, "X": 10.671875, 
-        "Y": 10.671875,  "Z": 9.7734375,  "[": 4.4453125, 
-       "\\": 4.4453125,  "]": 4.4453125,  "^": 7.5078125, 
-        "_": 8.8984375,  "`": 5.328125,   "a": 8.8984375, 
-        "b": 8.8984375,  "c": 8,          "d": 8.8984375, 
-        "e": 8.8984375,  "f": 4.15921875, "g": 8.8984375, 
-        "h": 8.8984375,  "i": 3.5546875,  "j": 3.5546875, 
-        "k": 8,          "l": 3.5546875,  "m": 13.328125, 
-        "n": 8.8984375,  "o": 8.8984375,  "p": 8.8984375, 
-        "q": 8.8984375,  "r": 5.328125,   "s": 8, 
-        "t": 4.4453125,  "u": 8.8984375,  "v": 8, 
-        "w": 11.5546875, "x": 8,          "y": 8, 
-        "z": 8,          "{": 5.34375,    "|": 4.15625, 
+        " ": 4.4453125,  "!": 4.4453125,  '"': 5.6796875,
+        "#": 8.8984375,  "$": 8.8984375,  "%": 14.2265625,
+        "&": 10.671875,  "'": 3.0546875,  "(": 5.328125,
+        ")": 5.328125,   "*": 6.2265625,  "+": 9.34375,
+        ",": 4.4453125,  "-": 5.328125,   ".": 4.4453125,
+        "/": 4.4453125,  "0": 8.8984375,  "1": 7.7228125,
+        "2": 8.8984375,  "3": 8.8984375,  "4": 8.8984375,
+        "5": 8.8984375,  "6": 8.8984375,  "7": 8.8984375,
+        "8": 8.8984375,  "9": 8.8984375,  ":": 4.4453125,
+        ";": 4.4453125,  "<": 9.34375,    "=": 9.34375,
+        ">": 9.34375,    "?": 8.8984375,  "@": 16.2421875,
+        "A": 10.671875,  "B": 10.671875,  "C": 11.5546875,
+        "D": 11.5546875, "E": 10.671875,  "F": 9.7734375,
+        "G": 12.4453125, "H": 11.5546875, "I": 4.4453125,
+        "J": 8,          "K": 10.671875,  "L": 8.8984375,
+        "M": 13.328125,  "N": 11.5546875, "O": 12.4453125,
+        "P": 10.671875,  "Q": 12.4453125, "R": 11.5546875,
+        "S": 10.671875,  "T": 9.7734375,  "U": 11.5546875,
+        "V": 10.671875,  "W": 15.1015625, "X": 10.671875,
+        "Y": 10.671875,  "Z": 9.7734375,  "[": 4.4453125,
+       "\\": 4.4453125,  "]": 4.4453125,  "^": 7.5078125,
+        "_": 8.8984375,  "`": 5.328125,   "a": 8.8984375,
+        "b": 8.8984375,  "c": 8,          "d": 8.8984375,
+        "e": 8.8984375,  "f": 4.15921875, "g": 8.8984375,
+        "h": 8.8984375,  "i": 3.5546875,  "j": 3.5546875,
+        "k": 8,          "l": 3.5546875,  "m": 13.328125,
+        "n": 8.8984375,  "o": 8.8984375,  "p": 8.8984375,
+        "q": 8.8984375,  "r": 5.328125,   "s": 8,
+        "t": 4.4453125,  "u": 8.8984375,  "v": 8,
+        "w": 11.5546875, "x": 8,          "y": 8,
+        "z": 8,          "{": 5.34375,    "|": 4.15625,
         "}": 5.34375,    "~": 9.34375
     }
 
@@ -119,7 +120,7 @@ expressions.filters.generateTargetsTable = function(input) {
             colspan++;
         return [val[0], Math.min(colspan, num_cols)];
     });
- 
+
     rows = [];
     while (vals.length > 0) {
         cols_left = num_cols;
@@ -157,12 +158,11 @@ expressions.filters.generateTargetsTable = function(input) {
     for (row of rows) {
         out += "<w:tr>";
         for (col of row) {
-            console.log(cw*col[1], col[1], col[0]);
-            out += `<w:tc><w:tcPr><w:tcW w:w="${cw*col[1]}" w:type="dxa" /><w:gridSpan w:val="${col[1]}" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${col[0]}</w:t></w:r></w:p></w:tc>`;
+            out += `<w:tc><w:tcPr><w:tcW w:w="${cw*col[1]}" w:type="dxa" /><w:gridSpan w:val="${col[1]}" /><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:t>${escapeXMLEntities(col[0])}</w:t></w:r></w:p></w:tc>`;
         }
         out += "</w:tr>"
     }
-    
+
     return pre + out + post;
 }
 
@@ -187,9 +187,9 @@ function generate_table(input, col_width, col_names) {
     // https://docxperiments.readthedocs.io/en/latest/synthesis/documentxml.html
     pre = `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid" /><w:tblW w:w="${tw}" w:type="pct" /><w:tblBorders><w:top w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:left w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:bottom w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:right w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideH w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /><w:insideV w:val="single" w:sz="24" w:space="0" w:color="FFFFFF" w:themeColor="background1" /></w:tblBorders><w:tblLayout w:type="fixed" /></w:tblPr>`;
     pre += '<w:tblGrid>' + col_width.map((w) => ` <w:gridCol w:w="${w}" />`).join('') + '</w:tblGrid>';
-    pre += '<w:tr>' + col_width.map((w, idx) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="2DA5DE" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:rPr><w:color w:val="FFFFFF" w:themeColor="background1" /><w:b w:val="true"/></w:rPr><w:t xml:space="preserve">${col_names[idx]}</w:t></w:r></w:p></w:tc>`).join('') + '</w:tr>' 
+    pre += '<w:tr>' + col_width.map((w, idx) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa" /><w:shd w:val="clear" w:color="auto" w:fill="2DA5DE" /></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /></w:pPr><w:r><w:rPr><w:color w:val="FFFFFF" w:themeColor="background1" /><w:b w:val="true"/></w:rPr><w:t xml:space="preserve">${col_names[idx]}</w:t></w:r></w:p></w:tc>`).join('') + '</w:tr>'
     post = '</w:tbl>';
-    
+
     out = "";
     for (row of input) {
         out += "<w:tr>";
@@ -224,7 +224,7 @@ expressions.filters.generateOutdatedSoftwareTable = function(input) {
             console.log(`Outdated Software table has invalid number of columns (${input[0].length})! not parsing. Data: ${input}`);
             return "";
     }
-    
+
     return generate_table(input, col_width, col_names)
 }
 
@@ -262,12 +262,12 @@ expressions.filters.findingIdLabel = function(input, severity) {
                 base = count_findings_per_severity(input, 'Critical') + 1;
                 break;
             case 'Medium':
-                base = count_findings_per_severity(input, 'Critical') + 
+                base = count_findings_per_severity(input, 'Critical') +
                        count_findings_per_severity(input, 'High') + 1;
                 break;
             case 'Low':
-                base = count_findings_per_severity(input, 'Critical') + 
-                       count_findings_per_severity(input, 'High') + 
+                base = count_findings_per_severity(input, 'Critical') +
+                       count_findings_per_severity(input, 'High') +
                        count_findings_per_severity(input, 'Medium') + 1;
                 break;
         }
@@ -294,7 +294,7 @@ expressions.filters.spanTo = function(start, end, locale) {
 
     if (start_date == "Invalid Date" || end_date == "Invalid Date") return start;
 
-    diff = Math.ceil(Math.abs(end_date - start_date) / (1000 * 60 * 60 * 24)) + 1; 
+    diff = Math.ceil(Math.abs(end_date - start_date) / (1000 * 60 * 60 * 24)) + 1;
     str = (diff == 1) ? "{0} day" : "{0} days";
     return translate.translate(str, locale).format((diff <= 20) ? numbers[locale][diff] : diff)
 }
