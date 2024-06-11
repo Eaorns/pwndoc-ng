@@ -201,6 +201,7 @@ module.exports = function(app, io) {
         if (req.body.scope && typeof(req.body.scope === "array")) {
             update.scope = req.body.scope.map(item => {return {name: item}});
         }
+        if (req.body.scopeMode) update.scopeMode = req.body.scopeMode;
         if (req.body.template) update.template = req.body.template;
         if (req.body.customFields) update.customFields = req.body.customFields;
         if (settings.reviews.enabled && settings.reviews.private.removeApprovalsUponUpdate) update.approvals = [];
@@ -274,6 +275,7 @@ module.exports = function(app, io) {
         if (req.body.cvssv3) finding.cvssv3 = req.body.cvssv3;
         if (req.body.poc) finding.poc = req.body.poc;
         if (req.body.scope) finding.scope = req.body.scope;
+        if (req.body.scopeMode) finding.scopeMode = req.body.scopeMode;
         if (req.body.status !== undefined) finding.status = req.body.status;
         if (req.body.category) finding.category = req.body.category
         if (req.body.customFields) finding.customFields = req.body.customFields
@@ -326,6 +328,7 @@ module.exports = function(app, io) {
         if (req.body.cvssv3) finding.cvssv3 = req.body.cvssv3;
         if (!_.isNil(req.body.poc)) finding.poc = req.body.poc;
         if (!_.isNil(req.body.scope)) finding.scope = req.body.scope;
+        if (req.body.scopeMode) finding.scopeMode = req.body.scopeMode;
         if (req.body.status !== undefined) finding.status = req.body.status;
         if (req.body.category) finding.category = req.body.category
         if (req.body.customFields) finding.customFields = req.body.customFields

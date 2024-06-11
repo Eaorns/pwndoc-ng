@@ -125,15 +125,15 @@ export default {
             .then((data) => {
                 this.finding = data.data.datas;
                 if (this.finding.customFields && // For retrocompatibility with customField reference instead of object
-                    this.finding.customFields.length > 0 && 
-                    typeof (this.finding.customFields[0].customField) === 'string') 
+                    this.finding.customFields.length > 0 &&
+                    typeof (this.finding.customFields[0].customField) === 'string')
                     this.finding.customFields = Utils.filterCustomFields('finding', this.finding.category, this.$parent.customFields, this.finding.customFields, this.$parent.audit.language)
                 if (this.finding.paragraphs.length > 0 && !this.finding.poc)
                     this.finding.poc = this.convertParagraphsToHTML(this.finding.paragraphs)
 
                 this.$nextTick(() => {
                     Utils.syncEditors(this.$refs)
-                    this.findingOrig = this.$_.cloneDeep(this.finding); 
+                    this.findingOrig = this.$_.cloneDeep(this.finding);
                 })
             })
             .catch((err) => {
@@ -173,7 +173,7 @@ export default {
                     })
                     return
                 }
-                
+
                 AuditService.updateFinding(this.auditId, this.findingId, this.finding)
                 .then(() => {
                     this.findingOrig = this.$_.cloneDeep(this.finding);

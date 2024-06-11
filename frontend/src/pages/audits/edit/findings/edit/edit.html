@@ -25,7 +25,7 @@
         <q-tab name="definition" default :label="$t('definition')" />
         <q-tab name="proofs" :label="$t('proofs')"/>
         <q-tab name="details" :label="$t('details')" />
-        <template v-if="frontEndAuditState === AUDIT_VIEW_STATE.EDIT"> 
+        <template v-if="frontEndAuditState === AUDIT_VIEW_STATE.EDIT">
         <q-separator vertical />
         <q-toggle :label="$t('completed')" v-model="finding.status" :true-value=0 :false-value=1 checked-icon="check" unchecked-icon="clear" color="green" />
         </template>
@@ -37,14 +37,14 @@
             <q-card>
                 <q-card-section class="row q-col-gutter-md">
                     <q-input class="col-md-8 col-12" :label="$t('title')+' *'" stack-label v-model="finding.title" outlined :readonly="frontEndAuditState !== AUDIT_VIEW_STATE.EDIT"/>
-                    <q-select 
+                    <q-select
                     class="col-md-4 col-12"
                     :label="$t('type')"
-                    v-model="finding.vulnType" 
-                    :options="vulnTypesLang" 
-                    option-value="name" 
-                    option-label="name" 
-                    emit-value 
+                    v-model="finding.vulnType"
+                    :options="vulnTypesLang"
+                    option-value="name"
+                    option-label="name"
+                    emit-value
                     map-options
                     options-sanitize
                     outlined
@@ -63,17 +63,17 @@
                     <textarea-array class="col-12" :label="$t('references')" v-model="finding.references" :readonly="frontEndAuditState !== AUDIT_VIEW_STATE.EDIT"/>
                 </q-card-section>
 
-                <q-expansion-item 
+                <q-expansion-item
                 :label="$t('customFields')"
                 v-if="finding.customFields && finding.customFields.length > 0"
                 default-opened
-                header-class="bg-blue-grey-5 text-white" 
+                header-class="bg-blue-grey-5 text-white"
                 expand-icon-class="text-white">
-                    <custom-fields 
-                    ref="customfields" 
-                    v-model="finding.customFields" 
-                    custom-element="QCardSection" 
-                    v-on:editorchange="readyToSave ? needSave=true : null" 
+                    <custom-fields
+                    ref="customfields"
+                    v-model="finding.customFields"
+                    custom-element="QCardSection"
+                    v-on:editorchange="readyToSave ? needSave=true : null"
                     no-sync-editor
                     :readonly="frontEndAuditState !== AUDIT_VIEW_STATE.EDIT"
                     :locale="$parent.audit.language"
@@ -98,6 +98,20 @@
                 <q-card-section>{{$t('affectedAssets')}}</q-card-section>
                 <q-separator />
                 <q-card-section>
+                    <q-select
+                        :label="$t('scopeMode')"
+                        stack-label
+                        class="col-md-6 col-12"
+                        v-model="finding.scopeMode"
+                        :options="[{label: $t('regex'), value: 'regex'},{label: $t('lines'), value: 'lines'}]"
+                        map-options
+                        emit-value
+                        options-sanitize
+                        outlined
+                        :readonly="frontEndAuditState !== AUDIT_VIEW_STATE.EDIT"
+                        />
+                </q-card-section>
+                <q-card-section>
                     <q-field borderless>
                         <template v-slot="control">
                             <basic-editor v-model="finding.scope" idUnique="basiceditor_scope" v-on:editorchange="readyToSave ? needSave=true : null" :editable="frontEndAuditState === AUDIT_VIEW_STATE.EDIT"/>
@@ -107,7 +121,7 @@
             </q-card>
             <q-card class="q-mt-md bg-grey-1">
                 <div class="col-12">
-                    <cvss-calculator 
+                    <cvss-calculator
                     v-model="finding.cvssv3"
                     :readonly="frontEndAuditState !== AUDIT_VIEW_STATE.EDIT"
                     />

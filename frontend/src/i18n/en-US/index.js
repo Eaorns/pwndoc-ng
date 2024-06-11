@@ -365,6 +365,9 @@ export default {
     observation: 'Observation',
     references: 'References (One per line)',
     customFields: 'Custom Fields',
+    scopeMode: 'Affected asset interpretation mode',
+    regex: 'Regex',
+    lines: 'Lines',
     affectedAssets: 'Affected Assets',
     courseOfActions: 'Course of actions',
     template: 'Template',
@@ -515,7 +518,7 @@ export default {
     removeAllPriorApprovals: 'All its prior approvals are removed.',
     keepAllPriorApprovals: 'All its prior approvals are kept.',
     mandatoryReview: 'Mandatory Review',
-    mandatoryReviewInfo: `Makes the review process mandatory. When activated, a user cannot export an audit unless it has been approved by the specified number of reviewers. 
+    mandatoryReviewInfo: `Makes the review process mandatory. When activated, a user cannot export an audit unless it has been approved by the specified number of reviewers.
     <br/>The minimal number of reviewers is also used to determine if a report is marked as approved.`,
     minimalNumberOfReviewers: 'Minimal number of reviewers',
     numberDayBeforeDelete:'Number of days before deletion',

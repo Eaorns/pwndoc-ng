@@ -860,6 +860,7 @@ async function prepAuditData(data, settings) {
             references: finding.references || [],
             poc: await splitHTMLParagraphs(finding.poc),
             affected: finding.scope || "",
+            affectedParseMode: finding.scopeMode || 'regex',
             status: finding.status || "",
             category: $t(finding.category) || $t("No Category"),
             identifier: "IDX-" + utils.lPad(finding.identifier)

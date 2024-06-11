@@ -43,20 +43,19 @@ expressions.filters.condCheck = function(input) {
     return `<w:p><w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto" /><w:jc w:val="center" /></w:pPr><w:r>${(input) ? '<w:sym w:font="Wingdings" w:char="F0FC" />' : ''}</w:r></w:p>`;
 }
 
-expressions.filters.extractTargets = function(input) {
+expressions.filters.extractTargets = function(input, mode='regex') {
     lines = [...input.matchAll(/<p>(.*?)<\/p>/gm)].map((match) => match[1]) ?? []
     out = []
-    for (line of lines) {
-        if (line.length == 0)
-            continue;
-        targets = [...new Set(line.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? []
-        if (targets.length == 0)
-            out.push(line)
-        else
+    if (mode == 'regex') {
+        for (line of lines) {
+            if (line.length == 0)
+                continue;
+            targets = [...new Set(line.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? []
             out = out.concat(targets)
+        }
+        return out;
     }
-    console.log(out);
-    return out;
+    return lines;
 }
 
 expressions.filters.generateTargetsTable = function(input) {
