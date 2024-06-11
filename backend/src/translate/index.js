@@ -2,7 +2,7 @@ var fs = require('fs')
 var gLocale = 'en'
 
 function setLocale(locale) {
-    let localed = {'Nederlands': 'nl', 'Netherlands': 'nl', 'English': 'en', 'Engels': 'en'}
+    let localed = {'Nederlands': 'nl', 'United States': 'en', 'English': 'en'}
     gLocale = localed[locale]
 }
 exports.setLocale = setLocale
