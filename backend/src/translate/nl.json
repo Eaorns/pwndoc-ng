@@ -23,5 +23,8 @@
     "on {0} and {1}": "op {0} en {1}",
     "on {0}": "op {0}",
     "{0} day": "{0} dag",
-    "{0} days": "{0} dagen"
+    "{0} days": "{0} dagen",
+
+    "auditBaseName": "Testrapportage",
+    "validationBaseName": "Validatierapportage"
 }

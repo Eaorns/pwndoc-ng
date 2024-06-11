@@ -23,7 +23,6 @@ var filters = {};
 expressions.filters.cveSlider = function(input, score) {
     score = typeof score == 'object' ? score.value : score;
     score = typeof score == "String" ? parseInt(score) : score;
-    console.log("SCORE", score);
 
     if (score == undefined || score < 0 || score > 10)
         score = 0;

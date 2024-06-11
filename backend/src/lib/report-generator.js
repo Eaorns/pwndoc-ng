@@ -839,9 +839,10 @@ async function prepAuditData(data, settings) {
 
     result.year = {
         short: new Date().getFullYear().toString().slice(-2),
-        long: new Date().getFullYear().toString()
+        long:  new Date().getFullYear().toString(),
+        exec_short: new Date(data.date_start).getFullYear().toString().slice(-2),
+        exec_long:  new Date(data.date_start).getFullYear().toString(),
     }
-
 
     result.language = data.language || "undefined"
     result.scope = data.scope.toObject() || []
