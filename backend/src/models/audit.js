@@ -27,7 +27,7 @@ var Finding = {
     cvssv3:                 String,
     paragraphs:             [Paragraph],
     poc:                    String,
-    scope:                  String,
+    scope:                  [String],
     scopeMode:              {type: String, enum: ['regex', 'lines'], default: 'regex'}, // How to interpret scope. If regex, extract IPs and URLs using regex. Otherwise, interpret each line as an item
     status:                 {type: Number, enum: [0,1], default: 1}, // 0: done, 1: redacting
     category:               String,

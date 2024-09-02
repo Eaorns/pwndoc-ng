@@ -43,10 +43,9 @@ expressions.filters.condCheck = function(input) {
 }
 
 expressions.filters.extractTargets = function(input, mode='regex') {
-    lines = [...input.matchAll(/<p>(.*?)<\/p>/gm)].map((match) => match[1]) ?? []
-    out = []
     if (mode == 'regex') {
-        for (line of lines) {
+        out = []
+        for (line of input) {
             if (line.length == 0)
                 continue;
             targets = [...new Set(line.match(/((https?:\/\/){0,1}[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))/g))] ?? []
@@ -54,7 +53,7 @@ expressions.filters.extractTargets = function(input, mode='regex') {
         }
         return out;
     }
-    return lines;
+    return input;
 }
 
 expressions.filters.generateTargetsTable = function(input) {
