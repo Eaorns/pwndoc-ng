@@ -412,7 +412,6 @@ module.exports = function(app, io) {
         Audit.getAudit(acl.isAllowed(req.decodedToken.role, 'audits:read-all'), req.params.auditId, req.decodedToken.id)
         .then(async audit => {
             var settings = await Settings.getAll();
-            console.log(audit.language);
             translate.setLocale(audit.language)
 
             if (settings.reviews.enabled && settings.reviews.public.mandatoryReview && audit.state !== 'APPROVED') {
@@ -424,7 +423,6 @@ module.exports = function(app, io) {
                 throw ({fn: 'BadParameters', message: 'Template not defined'})
 
             var reportDoc = await reportGenerator.generateDoc(audit);
-            console.log(translate.translate, translate.translate('auditBaseName'));
 
             var audit_name = `${translate.translate('auditBaseName')}-${('shortName' in audit.company && audit.company.shortName != undefined) ? audit.company.shortName : audit.company.name}-${new Date(audit.date_start).getFullYear().toString().slice(-2)}.${audit.customFields.find((e) => e.customField.label == 'Projectnummer').text}-v0.1`.replace(/[\\\/:*?"<>|]/g, "");
             Response.SendFile(res, `${audit_name}.${audit.template.ext || 'docx'}`, reportDoc);

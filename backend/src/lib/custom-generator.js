@@ -5,7 +5,10 @@ const { escapeXMLEntities } = require('./utils');
 
 var numbers = {'nl': ['nul', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven',
                       'acht', 'negen', 'tien', 'elf', 'twaalf', 'dertien', 'veertien',
-                      'vijftien', 'zestien', 'zeventien', 'achtien', 'negentien', 'twintig']};
+                      'vijftien', 'zestien', 'zeventien', 'achtien', 'negentien', 'twintig'],
+               'en': ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven',
+                      'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
+                      'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty']};
 
 // Apply all customs functions
 function apply(data) {
@@ -275,7 +278,7 @@ expressions.filters.findingIdLabel = function(input, severity) {
         case 2:
             return `${chap}.${base} & ${chap}.${base+1}`
         default:
-            return `${chap}.${base} t/m ${chap}.${base+count-1}`
+            return `${chap}.${base} ${translate.translate('fromTo')} ${chap}.${base+count-1}`
     }
 }
 

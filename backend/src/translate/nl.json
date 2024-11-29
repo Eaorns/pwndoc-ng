@@ -28,5 +28,6 @@
     "auditBaseName": "Testrapportage",
     "validationBaseName": "Validatierapportage",
 
-    "targetTableName": "Doelobjecten"
+    "targetTableName": "Doelobjecten",
+    "fromTo": "t/m"
 }

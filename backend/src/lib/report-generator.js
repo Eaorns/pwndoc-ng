@@ -24,8 +24,6 @@ async function generateDoc(audit, validationreport=false) {
 
     var zip = new PizZip(content);
 
-    console.log(audit.sections[2].customFields[0]);
-
     translate.setLocale(audit.language)
     $t = translate.translate
 
@@ -268,7 +266,11 @@ expressions.filters.fromTo = function(start, end, locale) {
         start_str = start_date.toLocaleDateString(locale, options);
     }
     else if (start_date.getDay() != end_date.getDay()) {
-        options = {weekday: "long", day: 'numeric'};
+        if (locale == 'nl') {
+            options = {weekday: "long", day: 'numeric'};
+        } else {
+            options = {weekday: "long", day: 'numeric', month: 'long'};
+        }
         start_str = start_date.toLocaleDateString(locale, options);
     }
     else {
