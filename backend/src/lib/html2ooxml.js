@@ -130,7 +130,8 @@ function html2ooxml(html, style = "") {
             break;
           case 'div':
           case 'p':
-            if (style && typeof style === 'string') {
+            // Do not overwrite style if style is already set, for example with bullet points.
+            if (style && typeof style === 'string' && cParagraphProperties.style == undefined) {
               cParagraphProperties.style = style
             }
             cParagraph = new docx.Paragraph(cParagraphProperties)
