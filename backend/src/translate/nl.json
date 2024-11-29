@@ -26,5 +26,7 @@
     "{0} days": "{0} dagen",
 
     "auditBaseName": "Testrapportage",
-    "validationBaseName": "Validatierapportage"
+    "validationBaseName": "Validatierapportage",
+
+    "targetTableName": "Doelobjecten"
 }

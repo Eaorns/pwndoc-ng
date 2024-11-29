@@ -1,4 +1,6 @@
 {
     "auditBaseName": "Security-report",
-    "validationBaseName": "Validation-report"
+    "validationBaseName": "Validation-report",
+
+    "targetTableName": "Targets"
 }
